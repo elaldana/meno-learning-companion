@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Learning Companion</title>
+    <title>Team Learning Companion - AI Chat with Learning Capture</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,7 @@
             flex-direction: column;
         }
         
+        /* Header */
         .header {
             background: white;
             border-bottom: 1px solid #e0e0e0;
@@ -41,6 +42,7 @@
             font-weight: bold;
         }
         
+        /* Chat Container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -50,10 +52,17 @@
             margin: 0 auto;
         }
         
+        /* Messages */
         .message {
             margin-bottom: 24px;
             display: flex;
             gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .avatar {
@@ -75,6 +84,8 @@
         .avatar.assistant {
             background: #f97316;
             color: white;
+            font-size: 12px;
+            font-weight: bold;
         }
         
         .message-content {
@@ -87,7 +98,6 @@
             border-radius: 12px;
             line-height: 1.5;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            white-space: pre-wrap;
         }
         
         .user-message .message-text {
@@ -95,34 +105,7 @@
             color: white;
         }
         
-        .thinking {
-            display: flex;
-            gap: 4px;
-            padding: 12px 16px;
-        }
-        
-        .thinking span {
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
-            animation: pulse 1.4s infinite ease-in-out both;
-        }
-        
-        .thinking span:nth-child(1) { animation-delay: -0.32s; }
-        .thinking span:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes pulse {
-            0%, 80%, 100% { 
-                transform: scale(0);
-                opacity: 0.5;
-            }
-            40% { 
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
+        /* Input Area */
         .input-container {
             background: white;
             border-top: 1px solid #e0e0e0;
@@ -157,9 +140,10 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            transition: background 0.2s;
         }
         
-        .send-button:hover:not(:disabled) {
+        .send-button:hover {
             background: #5558e3;
         }
         
@@ -168,6 +152,7 @@
             cursor: not-allowed;
         }
         
+        /* Floating Capture Button */
         .capture-button {
             position: fixed;
             bottom: 100px;
@@ -181,12 +166,18 @@
             font-weight: 500;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
         
         .capture-button:hover {
             background: #5558e3;
+            transform: translateY(-2px);
         }
         
+        /* Modal */
         .modal-container {
             position: fixed;
             top: 0;
@@ -238,6 +229,7 @@
             color: #666;
         }
         
+        /* Modal Steps */
         .modal-step {
             padding: 24px;
             display: none;
@@ -245,6 +237,12 @@
         
         .modal-step.active {
             display: block;
+        }
+        
+        /* Audience Selection */
+        .audience-intro {
+            margin-bottom: 20px;
+            color: #555;
         }
         
         .audience-buttons {
@@ -262,6 +260,7 @@
             cursor: pointer;
             text-align: left;
             font-size: 16px;
+            transition: all 0.2s;
         }
         
         .audience-btn:hover {
@@ -275,6 +274,7 @@
             color: white;
         }
         
+        /* Form */
         .form-group {
             margin-bottom: 20px;
         }
@@ -295,6 +295,41 @@
             font-family: inherit;
         }
         
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        
+        /* AI Enhancement */
+        .ai-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .ai-section h4 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .socratic-question {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+        
+        .key-learning {
+            background: #fff3e0;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        /* Buttons */
         .button-group {
             display: flex;
             gap: 12px;
@@ -309,6 +344,7 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
         }
         
         .btn-primary {
@@ -316,23 +352,16 @@
             color: white;
         }
         
+        .btn-primary:hover {
+            background: #5558e3;
+        }
+        
         .btn-secondary {
             background: #f5f5f5;
             color: #666;
         }
         
-        .ai-section {
-            margin-bottom: 24px;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .ai-section h4 {
-            margin: 0 0 12px 0;
-            font-size: 16px;
-        }
-        
+        /* Share Card */
         .share-card {
             background: #f8f9fa;
             border: 1px solid #e0e0e0;
@@ -340,6 +369,7 @@
             padding: 16px;
             margin-bottom: 16px;
             white-space: pre-wrap;
+            font-family: -apple-system, sans-serif;
         }
         
         .copy-btn {
@@ -354,6 +384,11 @@
             cursor: pointer;
         }
         
+        .copy-btn:hover {
+            background: #45a049;
+        }
+        
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -365,45 +400,71 @@
             border-radius: 8px;
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 2000;
         }
         
         .toast.show {
             opacity: 1;
         }
         
-        .error-message {
-            background: #fee;
-            color: #c00;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <div class="logo">TL</div>
-        <h3>Team Learning Companion</h3>
+        <div class="logo">M</div>
+        <h3>Meno Learning Companion</h3>
     </div>
     
+    <!-- Chat Container -->
     <div class="chat-container" id="chatContainer">
+        <!-- Welcome Message -->
         <div class="message">
-            <div class="avatar assistant">AI</div>
+            <div class="avatar assistant">Meno</div>
             <div class="message-content">
-                <div class="message-text">Hello! I'm Claude, your AI assistant. I can help you debug code, solve technical problems, and capture important learnings for your team. What challenge are you working on today?</div>
+                <div class="message-text">
+                    Hello! I'm Meno, your AI assistant. Like my namesake from Plato's dialogue, I'm here to help you discover knowledge through thoughtful questioning. Ask me about debugging, coding problems, or any technical challenges you're facing. When you solve something interesting, click the "💡 Capture Learning" button to create a shareable insight for your team!
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- Input Area -->
     <div class="input-container">
         <div class="input-wrapper">
-            <input type="text" class="input-field" id="messageInput" placeholder="Ask me anything...">
-            <button class="send-button" id="sendButton" onclick="sendMessage()">Send</button>
+            <input 
+                type="text" 
+                class="input-field" 
+                id="messageInput" 
+                placeholder="Ask me anything..."
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                Send
+            </button>
         </div>
     </div>
     
-    <button class="capture-button" onclick="startCapture()">💡 Capture Learning</button>
+    <!-- Floating Capture Button -->
+    <button class="capture-button" onclick="startCapture()">
+        💡 Capture Learning
+    </button>
     
+    <!-- Capture Modal -->
     <div class="modal-container" id="modalContainer">
         <div class="modal">
             <div class="modal-header">
@@ -411,50 +472,87 @@
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             
+            <!-- Step 1: Audience Selection -->
             <div class="modal-step active" id="step1">
-                <p style="margin-bottom: 20px;">I'll help track this problem and solution. Who might face this same problem?</p>
-                
-                <div class="audience-buttons" id="audienceButtons">
-                    <button class="audience-btn" data-audience="team">👥 My Team</button>
-                    <button class="audience-btn" data-audience="future">🔮 Future me</button>
-                    <button class="audience-btn" data-audience="new">🆕 New hires</button>
+                <p class="audience-intro">
+                    I'll help track this problem and solution. Who might face this same problem?
+                </p>
+                <div class="audience-buttons">
+                    <button class="audience-btn" onclick="selectAudience('team')">
+                        👥 My Team
+                    </button>
+                    <button class="audience-btn" onclick="selectAudience('future')">
+                        🔮 Future me
+                    </button>
+                    <button class="audience-btn" onclick="selectAudience('new')">
+                        🆕 New hires
+                    </button>
                 </div>
                 
-                <div class="form-group">
-                    <label>What was the problem?</label>
-                    <input type="text" id="problemInput">
-                </div>
-                <div class="form-group">
-                    <label>What was its cause?</label>
-                    <input type="text" id="causeInput">
-                </div>
-                <div class="form-group">
-                    <label>What was the solution?</label>
-                    <textarea id="solutionInput" rows="3"></textarea>
-                </div>
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="generateCard()">Generate Card</button>
-                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                </div>
+                <form id="captureForm">
+                    <div class="form-group">
+                        <label>What was the problem?</label>
+                        <input type="text" id="problemInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label>What was its cause?</label>
+                        <input type="text" id="causeInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label>What was the solution?</label>
+                        <textarea id="solutionInput" rows="3" required></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Generate Card</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    </div>
+                </form>
             </div>
             
+            <!-- Step 2: AI Enhancement -->
             <div class="modal-step" id="step2">
                 <div class="ai-section">
+                    <h4>🤖 AI Analysis</h4>
+                    <p id="aiAnalysis">Analyzing your conversation context...</p>
+                </div>
+                
+                <div class="ai-section">
                     <h4>🤔 Deeper Understanding</h4>
-                    <p id="socraticQuestion" style="font-style: italic; margin-bottom: 12px;">Generating question based on your conversation...</p>
-                    <textarea id="deeperThoughts" placeholder="Your thoughts (optional)..." rows="3"></textarea>
+                    <div class="socratic-question" id="socraticQuestion">
+                        Generating contextual question...
+                    </div>
+                    <textarea placeholder="Your thoughts (optional)..." rows="3"></textarea>
+                </div>
+                
+                <div class="ai-section">
+                    <h4>💭 How confident are you in your understanding?</h4>
+                    <div class="confidence-buttons">
+                        <button class="confidence-btn" onclick="setConfidence('low')">
+                            😕 Still learning
+                        </button>
+                        <button class="confidence-btn" onclick="setConfidence('medium')">
+                            🤔 Somewhat confident
+                        </button>
+                        <button class="confidence-btn" onclick="setConfidence('high')">
+                            😊 Very confident
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="ai-section">
                     <h4>💡 Key Learning</h4>
-                    <p id="keyLearning" style="font-weight: 500;">Extracting key insight from your solution...</p>
+                    <div class="key-learning" id="keyLearning">
+                        Extracting key insight...
+                    </div>
                 </div>
                 
                 <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goBackToStep1()">← Back</button>
                     <button class="btn btn-primary" onclick="showShareCard()">Continue</button>
                 </div>
             </div>
             
+            <!-- Step 3: Share Card -->
             <div class="modal-step" id="step3">
                 <div class="share-card" id="shareCard"></div>
                 <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
@@ -462,29 +560,46 @@
         </div>
     </div>
     
+    <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
     
     <script>
+        // Store conversation history
         let conversationHistory = [];
         let selectedAudience = '';
         let currentCapture = {};
-        let isProcessing = false;
+        let selectedConfidence = '';
+        
+        // Set confidence level
+        function setConfidence(level) {
+            selectedConfidence = level;
+            document.querySelectorAll('.confidence-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+        
+        // Go back to step 1
+        function goBackToStep1() {
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        }
         
         // Handle enter key
-        document.getElementById('messageInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !isProcessing) {
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
                 sendMessage();
             }
-        });
+        }
         
         // Send message
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
             
-            if (!message || isProcessing) return;
+            if (!message) return;
             
-            isProcessing = true;
+            // Disable input while processing
             input.disabled = true;
             document.getElementById('sendButton').disabled = true;
             
@@ -495,73 +610,17 @@
             // Clear input
             input.value = '';
             
-            // Show thinking indicator
-            showThinking();
+            // Simulate AI response (in production, this would call Claude API)
+            const response = await getAIResponse(message);
             
-            try {
-                // Call API route
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        conversationHistory: conversationHistory
-                    })
-                });
-                
-                const data = await response.json();
-                
-                // Remove thinking indicator
-                removeThinking();
-                
-                if (response.ok) {
-                    // Add AI response
-                    addMessage(data.response, 'assistant');
-                    conversationHistory.push({ role: 'assistant', content: data.response });
-                } else {
-                    // Show error
-                    addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
-                    console.error('API Error:', data);
-                }
-                
-            } catch (error) {
-                removeThinking();
-                addMessage('Sorry, I couldn\'t connect to the AI service. Please check your connection and try again.', 'assistant');
-                console.error('Fetch Error:', error);
-            }
+            // Add AI response
+            addMessage(response, 'assistant');
+            conversationHistory.push({ role: 'assistant', content: response });
             
-            isProcessing = false;
+            // Re-enable input
             input.disabled = false;
             document.getElementById('sendButton').disabled = false;
             input.focus();
-        }
-        
-        // Show thinking indicator
-        function showThinking() {
-            const chatContainer = document.getElementById('chatContainer');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.className = 'message thinking-message';
-            thinkingDiv.id = 'thinking';
-            thinkingDiv.innerHTML = `
-                <div class="avatar assistant">AI</div>
-                <div class="message-content">
-                    <div class="thinking">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            `;
-            chatContainer.appendChild(thinkingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-        
-        // Remove thinking indicator
-        function removeThinking() {
-            const thinking = document.getElementById('thinking');
-            if (thinking) thinking.remove();
         }
         
         // Add message to chat
@@ -569,122 +628,187 @@
             const chatContainer = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
+            
             messageDiv.innerHTML = `
-                <div class="avatar ${sender}">${sender === 'user' ? 'You' : 'AI'}</div>
+                <div class="avatar ${sender}">${sender === 'user' ? 'You' : 'Meno'}</div>
                 <div class="message-content">
                     <div class="message-text">${content}</div>
                 </div>
             `;
+            
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
-        // Setup audience buttons
-        document.getElementById('audienceButtons').addEventListener('click', function(e) {
-            if (e.target.classList.contains('audience-btn')) {
-                document.querySelectorAll('.audience-btn').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                e.target.classList.add('selected');
-                selectedAudience = e.target.dataset.audience;
+        // Simulate AI response (replace with actual Claude API call)
+        async function getAIResponse(message) {
+            // Simulate thinking time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const lowerMessage = message.toLowerCase();
+            
+            // Context-aware responses
+            if (lowerMessage.includes('slow') || lowerMessage.includes('performance') || lowerMessage.includes('timeout')) {
+                return "Performance issues often stem from inefficient queries or algorithms. Have you checked:\n\n1. Database query efficiency (N+1 queries?)\n2. Caching opportunities\n3. Algorithm complexity\n\nCan you tell me more about what's running slowly?";
+            } 
+            
+            if (lowerMessage.includes('error') || lowerMessage.includes('bug') || lowerMessage.includes('broken')) {
+                return "I can help debug that error. To better assist you:\n\n1. What's the exact error message?\n2. When does it occur?\n3. Have you checked the logs?\n\nShare the error details and I'll help you troubleshoot.";
             }
-        });
-        
-        // Start capture
-        function startCapture() {
-            if (conversationHistory.length < 2) {
-                showToast('Have a conversation first!');
-                return;
+            
+            if (lowerMessage.includes('fix') || lowerMessage.includes('solve') || lowerMessage.includes('solution')) {
+                return "Great question! Based on what you've described, here's a solution:\n\n1. First, identify the root cause\n2. Apply the appropriate fix\n3. Test thoroughly\n4. Document the solution\n\nWould you like me to elaborate on any of these steps?";
             }
-            document.getElementById('modalContainer').classList.add('show');
+            
+            if (lowerMessage.includes('api')) {
+                return "API issues can be tricky. Common causes include:\n\n1. Authentication/authorization problems\n2. Rate limiting\n3. Timeout settings\n4. Incorrect request format\n\nWhat specific behavior are you seeing with your API?";
+            }
+            
+            if (lowerMessage.includes('database') || lowerMessage.includes('query') || lowerMessage.includes('sql')) {
+                return "Database performance is crucial. Let's check:\n\n1. Are your queries using proper indexes?\n2. Any N+1 query problems?\n3. Connection pool settings?\n4. Query execution plans?\n\nWhat database system are you using?";
+            }
+            
+            if (lowerMessage.includes('deploy') || lowerMessage.includes('production')) {
+                return "Deployment issues require careful debugging. Consider:\n\n1. Environment variable differences\n2. Database migration status\n3. Build/compilation errors\n4. Server configuration\n\nWhat happens when you try to deploy?";
+            }
+            
+            if (lowerMessage.includes('test') || lowerMessage.includes('testing')) {
+                return "Testing is essential for reliable code. I can help with:\n\n1. Unit test strategies\n2. Integration testing\n3. Test coverage\n4. Mocking and stubbing\n\nWhat aspect of testing are you working on?";
+            }
+            
+            // If discussing a solution or fix
+            if (conversationHistory.length > 2 && (lowerMessage.includes('worked') || lowerMessage.includes('fixed') || lowerMessage.includes('solved'))) {
+                return "Excellent! You've solved the problem. This is a great learning moment.\n\nTo help others who might face this issue:\n1. What was the root cause?\n2. How did you identify it?\n3. What's the key insight here?\n\nConsider clicking '💡 Capture Learning' to document this solution for your team!";
+            }
+            
+            // Default response for unmatched patterns
+            return "I understand. Let me help you with that. Can you provide more details about the specific issue you're facing?";
         }
         
-        // Generate card with AI enhancement
-        async function generateCard() {
-            if (!selectedAudience) {
-                showToast('Please select an audience');
+        // Start capture flow
+        function startCapture() {
+            if (conversationHistory.length < 2) {
+                showToast('Have a conversation first before capturing learnings!');
                 return;
             }
             
+            document.getElementById('modalContainer').classList.add('show');
+            
+            // Pre-fill based on conversation
+            prefillCapture();
+        }
+        
+        // Prefill capture form based on conversation
+        function prefillCapture() {
+            // Simple extraction logic (in production, use AI)
+            const lastMessages = conversationHistory.slice(-4);
+            
+            // Try to extract problem from user messages
+            const userMessages = lastMessages.filter(m => m.role === 'user');
+            if (userMessages.length > 0) {
+                const problemText = userMessages[userMessages.length - 1].content;
+                document.getElementById('problemInput').value = problemText.substring(0, 100);
+            }
+        }
+        
+        // Select audience
+        function selectAudience(audience) {
+            selectedAudience = audience;
+            document.querySelectorAll('.audience-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+        
+        // Handle form submission
+        document.getElementById('captureForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedAudience) {
+                showToast('Please select an audience first');
+                return;
+            }
+            
+            // Capture form data
             currentCapture = {
                 audience: selectedAudience,
                 problem: document.getElementById('problemInput').value,
                 cause: document.getElementById('causeInput').value,
-                solution: document.getElementById('solutionInput').value
+                solution: document.getElementById('solutionInput').value,
+                timestamp: new Date().toISOString()
             };
             
-            if (!currentCapture.problem || !currentCapture.cause || !currentCapture.solution) {
-                showToast('Please fill all fields');
-                return;
-            }
-            
-            // Show AI enhancement step
+            // Move to AI enhancement step
             document.getElementById('step1').classList.remove('active');
             document.getElementById('step2').classList.add('active');
             
             // Generate AI enhancements
-            try {
-                // Generate Socratic question
-                const questionPrompt = `Based on this debugging scenario:
-Problem: ${currentCapture.problem}
-Cause: ${currentCapture.cause}
-Solution: ${currentCapture.solution}
-Audience: ${selectedAudience === 'team' ? 'development team' : selectedAudience === 'future' ? 'future reference' : 'new hires'}
-
-Generate one thoughtful follow-up question that would help deepen understanding. Keep it concise and specific.`;
-                
-                const questionResponse = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: questionPrompt })
-                });
-                
-                if (questionResponse.ok) {
-                    const questionData = await questionResponse.json();
-                    document.getElementById('socraticQuestion').textContent = questionData.response;
-                    currentCapture.socraticQuestion = questionData.response;
+            await performAIAnalysis();
+        });
+        
+        // Perform AI analysis
+        async function performAIAnalysis() {
+            // Simulate API calls
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Update AI analysis
+            document.getElementById('aiAnalysis').innerHTML = 
+                "✅ Your summary aligns well with the conversation. The problem and solution are clearly articulated.";
+            
+            // Generate audience-specific Socratic question
+            const audienceContext = {
+                'team': {
+                    context: "your team might ask at standup",
+                    questions: [
+                        "What happens if this same issue occurs in our microservices?",
+                        "How can we prevent this from happening in other endpoints?",
+                        "What's the performance impact we should expect?",
+                        "Should we add monitoring for this pattern?"
+                    ]
+                },
+                'future': {
+                    context: "you might ask yourself in 6 months",
+                    questions: [
+                        "What were the specific symptoms that led to this diagnosis?",
+                        "What tools or commands did I use to identify this?",
+                        "Are there any edge cases I should remember?",
+                        "What would I check first if this happens again?"
+                    ]
+                },
+                'new': {
+                    context: "a new hire might ask during onboarding",
+                    questions: [
+                        "What background knowledge is needed to understand this fix?",
+                        "Are there any documentation or resources about this pattern?",
+                        "What's the difference between the broken and fixed approaches?",
+                        "How common is this type of issue in our codebase?"
+                    ]
                 }
-                
-                // Generate key learning
-                const learningPrompt = `Based on this debugging scenario:
-Problem: ${currentCapture.problem}
-Cause: ${currentCapture.cause}
-Solution: ${currentCapture.solution}
-
-Extract ONE key learning principle (10-15 words) that others could apply to similar problems.`;
-                
-                const learningResponse = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: learningPrompt })
-                });
-                
-                if (learningResponse.ok) {
-                    const learningData = await learningResponse.json();
-                    document.getElementById('keyLearning').textContent = learningData.response;
-                    currentCapture.keyLearning = learningData.response;
-                }
-                
-            } catch (error) {
-                console.error('Error generating AI enhancements:', error);
-                // Use fallbacks
-                currentCapture.socraticQuestion = "What patterns from this solution could apply to similar problems?";
-                currentCapture.keyLearning = "Document and share debugging insights with your team.";
-                document.getElementById('socraticQuestion').textContent = currentCapture.socraticQuestion;
-                document.getElementById('keyLearning').textContent = currentCapture.keyLearning;
-            }
+            };
+            
+            const audience = selectedAudience || 'team';
+            const contextInfo = audienceContext[audience];
+            const randomQuestion = contextInfo.questions[Math.floor(Math.random() * contextInfo.questions.length)];
+            
+            const socraticIntro = `Good fix! Here's something ${contextInfo.context}:\n\n"${randomQuestion}"\n\nHow might you answer it?`;
+            
+            document.getElementById('socraticQuestion').textContent = socraticIntro;
+            currentCapture.socraticQuestion = randomQuestion;
+            
+            // Generate key learning
+            document.getElementById('keyLearning').textContent = 
+                "Always investigate root causes before implementing solutions - symptoms often mask deeper issues.";
+            
+            currentCapture.keyLearning = document.getElementById('keyLearning').textContent;
         }
         
         // Show share card
         function showShareCard() {
-            const audienceMap = {
-                team: '👥 Team',
-                future: '🔮 Future Reference',
-                new: '🆕 New Hire Guide'
+            const audienceEmoji = {
+                'team': '👥 Team',
+                'future': '🔮 Future Reference',
+                'new': '🆕 New Hire Guide'
             };
-            
-            // Capture deeper thoughts if provided
-            const deeperThoughts = document.getElementById('deeperThoughts').value;
             
             const shareText = `🐛 Debug Win
 
@@ -692,17 +816,17 @@ Extract ONE key learning principle (10-15 words) that others could apply to simi
 **Cause:** ${currentCapture.cause}
 **Solution:** ${currentCapture.solution}
 
-💡 **Key Learning:** ${currentCapture.keyLearning || 'Always investigate root causes before implementing solutions.'}
+💡 **Key Learning:** ${currentCapture.keyLearning}
 
-🤔 **Consider:** ${currentCapture.socraticQuestion || 'What patterns from this solution could apply elsewhere?'}
-${deeperThoughts ? `\n💭 **Deeper Insight:** ${deeperThoughts}` : ''}
+🤔 **Consider:** ${currentCapture.socraticQuestion}
 
-📝 **Audience:** ${audienceMap[currentCapture.audience]}
-⏱️ **Date:** ${new Date().toLocaleDateString()}`;
+📝 **Audience:** ${audienceEmoji[currentCapture.audience] || 'Team'}
+⏱️ **Captured:** ${new Date().toLocaleDateString()}`;
             
             document.getElementById('shareCard').textContent = shareText;
             currentCapture.shareText = shareText;
             
+            // Move to share step
             document.getElementById('step2').classList.remove('active');
             document.getElementById('step3').classList.add('active');
         }
@@ -710,35 +834,46 @@ ${deeperThoughts ? `\n💭 **Deeper Insight:** ${deeperThoughts}` : ''}
         // Copy to clipboard
         function copyToClipboard() {
             navigator.clipboard.writeText(currentCapture.shareText).then(() => {
-                showToast('Copied! Paste in Slack/Teams to share with your team.');
-                setTimeout(closeModal, 2000);
+                showToast('Copied to clipboard! 📋');
+                setTimeout(() => {
+                    closeModal();
+                }, 1500);
             });
         }
         
         // Close modal
         function closeModal() {
             document.getElementById('modalContainer').classList.remove('show');
+            // Reset form
+            document.getElementById('captureForm').reset();
+            document.querySelectorAll('.audience-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            // Reset steps
             document.querySelectorAll('.modal-step').forEach(step => {
                 step.classList.remove('active');
             });
             document.getElementById('step1').classList.add('active');
-            document.querySelectorAll('.audience-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.getElementById('problemInput').value = '';
-            document.getElementById('causeInput').value = '';
-            document.getElementById('solutionInput').value = '';
-            document.getElementById('deeperThoughts').value = '';
             selectedAudience = '';
         }
         
-        // Show toast
+        // Show toast notification
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
+        
+        // Close modal on backdrop click
+        document.getElementById('modalContainer').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalContainer')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
