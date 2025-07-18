@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Learning Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: #6366f1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .message {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .avatar.user {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .avatar.assistant {
+            background: #f97316;
+            color: white;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-text {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+        }
+        
+        .user-message .message-text {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .thinking {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+        
+        .thinking span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: pulse 1.4s infinite ease-in-out both;
+        }
+        
+        .thinking span:nth-child(1) { animation-delay: -0.32s; }
+        .thinking span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes pulse {
+            0%, 80%, 100% { 
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .input-container {
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 16px 24px;
+        }
+        
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .input-field:focus {
+            border-color: #6366f1;
+        }
+        
+        .send-button {
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            background: #5558e3;
+        }
+        
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .capture-button {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .capture-button:hover {
+            background: #5558e3;
+        }
+        
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-container.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+        
+        .modal-step {
+            padding: 24px;
+            display: none;
+        }
+        
+        .modal-step.active {
+            display: block;
+        }
+        
+        .audience-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .audience-btn {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+        }
+        
+        .audience-btn:hover {
+            border-color: #6366f1;
+            background: #f5f5ff;
+        }
+        
+        .audience-btn.selected {
+            border-color: #6366f1;
+            background: #6366f1;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .ai-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .ai-section h4 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }
+        
+        .share-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">TL</div>
+        <h3>Team Learning Companion</h3>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="message">
+            <div class="avatar assistant">AI</div>
+            <div class="message-content">
+                <div class="message-text">Hello! I'm Claude, your AI assistant. I can help you debug code, solve technical problems, and capture important learnings for your team. What challenge are you working on today?</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input type="text" class="input-field" id="messageInput" placeholder="Ask me anything...">
+            <button class="send-button" id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <button class="capture-button" onclick="startCapture()">💡 Capture Learning</button>
+    
+    <div class="modal-container" id="modalContainer">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>💡 Capture Your Learning</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="modal-step active" id="step1">
+                <p style="margin-bottom: 20px;">I'll help track this problem and solution. Who might face this same problem?</p>
+                
+                <div class="audience-buttons" id="audienceButtons">
+                    <button class="audience-btn" data-audience="team">👥 My Team</button>
+                    <button class="audience-btn" data-audience="future">🔮 Future me</button>
+                    <button class="audience-btn" data-audience="new">🆕 New hires</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>What was the problem?</label>
+                    <input type="text" id="problemInput">
+                </div>
+                <div class="form-group">
+                    <label>What was its cause?</label>
+                    <input type="text" id="causeInput">
+                </div>
+                <div class="form-group">
+                    <label>What was the solution?</label>
+                    <textarea id="solutionInput" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateCard()">Generate Card</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="modal-step" id="step2">
+                <div class="ai-section">
+                    <h4>🤔 Deeper Understanding</h4>
+                    <p id="socraticQuestion" style="font-style: italic; margin-bottom: 12px;">Generating question based on your conversation...</p>
+                    <textarea id="deeperThoughts" placeholder="Your thoughts (optional)..." rows="3"></textarea>
+                </div>
+                
+                <div class="ai-section">
+                    <h4>💡 Key Learning</h4>
+                    <p id="keyLearning" style="font-weight: 500;">Extracting key insight from your solution...</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="showShareCard()">Continue</button>
+                </div>
+            </div>
+            
+            <div class="modal-step" id="step3">
+                <div class="share-card" id="shareCard"></div>
+                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        let conversationHistory = [];
+        let selectedAudience = '';
+        let currentCapture = {};
+        let isProcessing = false;
+        
+        // Handle enter key
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !isProcessing) {
+                sendMessage();
+            }
+        });
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isProcessing) return;
+            
+            isProcessing = true;
+            input.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+            
+            // Add user message
+            addMessage(message, 'user');
+            conversationHistory.push({ role: 'user', content: message });
+            
+            // Clear input
+            input.value = '';
+            
+            // Show thinking indicator
+            showThinking();
+            
+            try {
+                // Call API route
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversationHistory: conversationHistory
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remove thinking indicator
+                removeThinking();
+                
+                if (response.ok) {
+                    // Add AI response
+                    addMessage(data.response, 'assistant');
+                    conversationHistory.push({ role: 'assistant', content: data.response });
+                } else {
+                    // Show error
+                    addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+                    console.error('API Error:', data);
+                }
+                
+            } catch (error) {
+                removeThinking();
+                addMessage('Sorry, I couldn\'t connect to the AI service. Please check your connection and try again.', 'assistant');
+                console.error('Fetch Error:', error);
+            }
+            
+            isProcessing = false;
+            input.disabled = false;
+            document.getElementById('sendButton').disabled = false;
+            input.focus();
+        }
+        
+        // Show thinking indicator
+        function showThinking() {
+            const chatContainer = document.getElementById('chatContainer');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'message thinking-message';
+            thinkingDiv.id = 'thinking';
+            thinkingDiv.innerHTML = `
+                <div class="avatar assistant">AI</div>
+                <div class="message-content">
+                    <div class="thinking">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(thinkingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Remove thinking indicator
+        function removeThinking() {
+            const thinking = document.getElementById('thinking');
+            if (thinking) thinking.remove();
+        }
+        
+        // Add message to chat
+        function addMessage(content, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="avatar ${sender}">${sender === 'user' ? 'You' : 'AI'}</div>
+                <div class="message-content">
+                    <div class="message-text">${content}</div>
+                </div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Setup audience buttons
+        document.getElementById('audienceButtons').addEventListener('click', function(e) {
+            if (e.target.classList.contains('audience-btn')) {
+                document.querySelectorAll('.audience-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+                selectedAudience = e.target.dataset.audience;
+            }
+        });
+        
+        // Start capture
+        function startCapture() {
+            if (conversationHistory.length < 2) {
+                showToast('Have a conversation first!');
+                return;
+            }
+            document.getElementById('modalContainer').classList.add('show');
+        }
+        
+        // Generate card with AI enhancement
+        async function generateCard() {
+            if (!selectedAudience) {
+                showToast('Please select an audience');
+                return;
+            }
+            
+            currentCapture = {
+                audience: selectedAudience,
+                problem: document.getElementById('problemInput').value,
+                cause: document.getElementById('causeInput').value,
+                solution: document.getElementById('solutionInput').value
+            };
+            
+            if (!currentCapture.problem || !currentCapture.cause || !currentCapture.solution) {
+                showToast('Please fill all fields');
+                return;
+            }
+            
+            // Show AI enhancement step
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            
+            // Generate AI enhancements
+            try {
+                // Generate Socratic question
+                const questionPrompt = `Based on this debugging scenario:
+Problem: ${currentCapture.problem}
+Cause: ${currentCapture.cause}
+Solution: ${currentCapture.solution}
+Audience: ${selectedAudience === 'team' ? 'development team' : selectedAudience === 'future' ? 'future reference' : 'new hires'}
+
+Generate one thoughtful follow-up question that would help deepen understanding. Keep it concise and specific.`;
+                
+                const questionResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: questionPrompt })
+                });
+                
+                if (questionResponse.ok) {
+                    const questionData = await questionResponse.json();
+                    document.getElementById('socraticQuestion').textContent = questionData.response;
+                    currentCapture.socraticQuestion = questionData.response;
+                }
+                
+                // Generate key learning
+                const learningPrompt = `Based on this debugging scenario:
+Problem: ${currentCapture.problem}
+Cause: ${currentCapture.cause}
+Solution: ${currentCapture.solution}
+
+Extract ONE key learning principle (10-15 words) that others could apply to similar problems.`;
+                
+                const learningResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: learningPrompt })
+                });
+                
+                if (learningResponse.ok) {
+                    const learningData = await learningResponse.json();
+                    document.getElementById('keyLearning').textContent = learningData.response;
+                    currentCapture.keyLearning = learningData.response;
+                }
+                
+            } catch (error) {
+                console.error('Error generating AI enhancements:', error);
+                // Use fallbacks
+                currentCapture.socraticQuestion = "What patterns from this solution could apply to similar problems?";
+                currentCapture.keyLearning = "Document and share debugging insights with your team.";
+                document.getElementById('socraticQuestion').textContent = currentCapture.socraticQuestion;
+                document.getElementById('keyLearning').textContent = currentCapture.keyLearning;
+            }
+        }
+        
+        // Show share card
+        function showShareCard() {
+            const audienceMap = {
+                team: '👥 Team',
+                future: '🔮 Future Reference',
+                new: '🆕 New Hire Guide'
+            };
+            
+            // Capture deeper thoughts if provided
+            const deeperThoughts = document.getElementById('deeperThoughts').value;
+            
+            const shareText = `🐛 Debug Win
+
+**Problem:** ${currentCapture.problem}
+**Cause:** ${currentCapture.cause}
+**Solution:** ${currentCapture.solution}
+
+💡 **Key Learning:** ${currentCapture.keyLearning || 'Always investigate root causes before implementing solutions.'}
+
+🤔 **Consider:** ${currentCapture.socraticQuestion || 'What patterns from this solution could apply elsewhere?'}
+${deeperThoughts ? `\n💭 **Deeper Insight:** ${deeperThoughts}` : ''}
+
+📝 **Audience:** ${audienceMap[currentCapture.audience]}
+⏱️ **Date:** ${new Date().toLocaleDateString()}`;
+            
+            document.getElementById('shareCard').textContent = shareText;
+            currentCapture.shareText = shareText;
+            
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            navigator.clipboard.writeText(currentCapture.shareText).then(() => {
+                showToast('Copied! Paste in Slack/Teams to share with your team.');
+                setTimeout(closeModal, 2000);
+            });
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('modalContainer').classList.remove('show');
+            document.querySelectorAll('.modal-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step1').classList.add('active');
+            document.querySelectorAll('.audience-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('problemInput').value = '';
+            document.getElementById('causeInput').value = '';
+            document.getElementById('solutionInput').value = '';
+            document.getElementById('deeperThoughts').value = '';
+            selectedAudience = '';
+        }
+        
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
