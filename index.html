@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Learning Companion - AI Chat with Learning Capture</title>
+    <title>Meno Learning Companion - Capture & Share Your Insights</title>
     <style>
         * {
             margin: 0;
@@ -27,6 +27,12 @@
             padding: 16px 24px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
         
@@ -42,6 +48,47 @@
             font-weight: bold;
         }
         
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .model-dropdown {
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .model-dropdown:hover {
+            border-color: #6366f1;
+        }
+        
+        .library-button {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .library-button:hover {
+            background: #e0e0e0;
+        }
+        
         /* Chat Container */
         .chat-container {
             flex: 1;
@@ -50,6 +97,101 @@
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
+            display: block;
+        }
+        
+        .chat-container.hidden {
+            display: none;
+        }
+        
+        /* Library View */
+        .library-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+        }
+        
+        .library-container.active {
+            display: block;
+        }
+        
+        .library-header {
+            margin-bottom: 24px;
+        }
+        
+        .library-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-button {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .filter-button.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+        
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .insight-card-item {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .insight-card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .insight-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .insight-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-button {
+            padding: 4px 8px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
         }
         
         /* Messages */
@@ -98,6 +240,7 @@
             border-radius: 12px;
             line-height: 1.5;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
         }
         
         .user-message .message-text {
@@ -143,7 +286,7 @@
             transition: background 0.2s;
         }
         
-        .send-button:hover {
+        .send-button:hover:not(:disabled) {
             background: #5558e3;
         }
         
@@ -170,6 +313,7 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s;
+            z-index: 999;
         }
         
         .capture-button:hover {
@@ -322,11 +466,79 @@
             margin-bottom: 12px;
         }
         
+        .socratic-response {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
         .key-learning {
             background: #fff3e0;
             padding: 12px;
             border-radius: 6px;
             font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .validation-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .validation-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .validation-btn:hover {
+            border-color: #6366f1;
+        }
+        
+        .validation-btn.accept {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        .validation-btn.revise {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+        
+        .confidence-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .confidence-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .confidence-btn:hover {
+            border-color: #6366f1;
+        }
+        
+        .confidence-btn.selected {
+            border-color: #6366f1;
+            background: #6366f1;
+            color: white;
         }
         
         /* Buttons */
@@ -352,8 +564,13 @@
             color: white;
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: #5558e3;
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         
         .btn-secondary {
@@ -388,6 +605,23 @@
             background: #45a049;
         }
         
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .save-btn:hover {
+            background: #5558e3;
+        }
+        
         /* Toast */
         .toast {
             position: fixed;
@@ -410,24 +644,88 @@
         /* Loading */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
+            vertical-align: middle;
+            margin-left: 8px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        .thinking-indicator {
+            display: none;
+            color: #666;
+            font-style: italic;
+            margin: 12px 0;
+        }
+        
+        .thinking-indicator.show {
+            display: block;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .model-selector label {
+                display: none;
+            }
+            
+            .model-dropdown {
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+            
+            .library-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .capture-button {
+                bottom: 80px;
+                right: 20px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <div class="logo">M</div>
-        <h3>Meno Learning Companion</h3>
+        <div class="header-left">
+            <div class="logo">M</div>
+            <h3>Meno Learning Companion</h3>
+        </div>
+        <div class="header-actions">
+            <div class="model-selector">
+                <label for="modelSelect">Model:</label>
+                <select id="modelSelect" class="model-dropdown" onchange="saveModelPreference()" title="Choose AI model based on your needs">
+                    <option value="claude-3-haiku-20240307" title="Fastest responses, good for quick questions">Claude 3 Haiku (Fast)</option>
+                    <option value="claude-3-5-sonnet-20241022" title="Best balance of speed and capability" selected>Claude 3.5 Sonnet (Balanced)</option>
+                    <option value="claude-3-opus-20240229" title="Most capable for complex problems">Claude 3 Opus (Powerful)</option>
+                    <option value="claude-opus-4-20250514" title="Latest and most powerful model">Claude Opus 4 (Latest)</option>
+                </select>
+            </div>
+            <button class="library-button" onclick="toggleLibrary()">
+                📚 Insight Library
+            </button>
+        </div>
     </div>
     
     <!-- Chat Container -->
@@ -436,15 +734,41 @@
         <div class="message">
             <div class="avatar assistant">Meno</div>
             <div class="message-content">
-                <div class="message-text">
-                    Hello! I'm Meno, your AI assistant. Like my namesake from Plato's dialogue, I'm here to help you discover knowledge through thoughtful questioning. Ask me about debugging, coding problems, or any technical challenges you're facing. When you solve something interesting, click the "💡 Capture Learning" button to create a shareable insight for your team!
-                </div>
+                <div class="message-text">Hello! I'm Meno, your AI learning companion. Like my namesake from Plato's dialogue, I'm here to help you discover knowledge through thoughtful questioning. 
+
+Ask me about any challenge you're facing - whether it's debugging code, solving a math problem, understanding a concept, or tackling a creative project. 
+
+When you solve something interesting or learn something new, click the "💡 Capture Learning" button to create a shareable insight for your team, your future self, or others who might benefit!
+
+💡 Tip: You can choose different AI models in the header - Haiku for quick responses, Sonnet for balanced performance, Opus 3 for complex problems, or Opus 4 for the most advanced capabilities.</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Library Container -->
+    <div class="library-container" id="libraryContainer">
+        <div class="library-header">
+            <h2>Your Insight Library</h2>
+            <p>All your captured learnings in one place</p>
+        </div>
+        
+        <div class="library-filters">
+            <button class="filter-button active" onclick="filterInsights('all')">All</button>
+            <button class="filter-button" onclick="filterInsights('team')">👥 Team</button>
+            <button class="filter-button" onclick="filterInsights('future')">🔮 Future Me</button>
+            <button class="filter-button" onclick="filterInsights('new')">🆕 New Hires</button>
+        </div>
+        
+        <div class="insight-grid" id="insightGrid">
+            <div class="empty-state">
+                <h3>No insights captured yet</h3>
+                <p>Start a conversation and capture your first learning!</p>
             </div>
         </div>
     </div>
     
     <!-- Input Area -->
-    <div class="input-container">
+    <div class="input-container" id="inputContainer">
         <div class="input-wrapper">
             <input 
                 type="text" 
@@ -472,7 +796,7 @@
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             
-            <!-- Step 1: Audience Selection -->
+            <!-- Step 1: Audience Selection & Form -->
             <div class="modal-step active" id="step1">
                 <p class="audience-intro">
                     I'll help track this problem and solution. Who might face this same problem?
@@ -511,6 +835,10 @@
             
             <!-- Step 2: AI Enhancement -->
             <div class="modal-step" id="step2">
+                <div class="thinking-indicator" id="thinkingIndicator">
+                    🤔 Analyzing your conversation and insights...
+                </div>
+                
                 <div class="ai-section">
                     <h4>🤖 AI Analysis</h4>
                     <p id="aiAnalysis">Analyzing your conversation context...</p>
@@ -521,7 +849,7 @@
                     <div class="socratic-question" id="socraticQuestion">
                         Generating contextual question...
                     </div>
-                    <textarea placeholder="Your thoughts (optional)..." rows="3"></textarea>
+                    <textarea class="socratic-response" id="socraticResponse" placeholder="Your thoughts (optional)..." rows="3"></textarea>
                 </div>
                 
                 <div class="ai-section">
@@ -544,11 +872,21 @@
                     <div class="key-learning" id="keyLearning">
                         Extracting key insight...
                     </div>
+                    <div class="validation-buttons">
+                        <button class="validation-btn accept" onclick="validateLearning(true)">
+                            ✓ Yes, that's it
+                        </button>
+                        <button class="validation-btn revise" onclick="validateLearning(false)">
+                            ✗ Let me revise
+                        </button>
+                    </div>
+                    <textarea class="form-group" id="revisedLearning" style="display:none; margin-top:12px;" 
+                              placeholder="Write your own key learning..." rows="2"></textarea>
                 </div>
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="goBackToStep1()">← Back</button>
-                    <button class="btn btn-primary" onclick="showShareCard()">Continue</button>
+                    <button class="btn btn-primary" id="continueBtn" onclick="showShareCard()" disabled>Continue</button>
                 </div>
             </div>
             
@@ -556,6 +894,7 @@
             <div class="modal-step" id="step3">
                 <div class="share-card" id="shareCard"></div>
                 <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                <button class="save-btn" onclick="saveAndClose()">💾 Save to Library</button>
             </div>
         </div>
     </div>
@@ -564,11 +903,168 @@
     <div class="toast" id="toast"></div>
     
     <script>
-        // Store conversation history
+        // Configuration
+        // Update this to your actual Vercel deployment URL
+        // For local development with Vercel CLI: http://localhost:3000/api/chat
+        // For production: https://your-app-name.vercel.app/api/chat
+        const API_ENDPOINT = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api/chat'
+            : '/api/chat';
+        
+        // Store conversation history and insights
         let conversationHistory = [];
         let selectedAudience = '';
         let currentCapture = {};
         let selectedConfidence = '';
+        let aiAnalysisData = {};
+        let learningValidated = false;
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInsights();
+            loadModelPreference();
+            document.getElementById('messageInput').focus();
+            
+            // Debug: Log the API endpoint being used
+            console.log('API Endpoint:', API_ENDPOINT);
+            console.log('Current hostname:', window.location.hostname);
+        });
+        
+        // Load saved model preference
+        function loadModelPreference() {
+            const savedModel = localStorage.getItem('menoSelectedModel');
+            if (savedModel) {
+                document.getElementById('modelSelect').value = savedModel;
+            }
+        }
+        
+        // Save model preference
+        function saveModelPreference() {
+            const selectedModel = document.getElementById('modelSelect').value;
+            localStorage.setItem('menoSelectedModel', selectedModel);
+            showToast('Model preference saved');
+        }
+        
+        // Get current selected model
+        function getSelectedModel() {
+            return document.getElementById('modelSelect').value;
+        }
+        
+        // Toggle between chat and library view
+        function toggleLibrary() {
+            const chatContainer = document.getElementById('chatContainer');
+            const libraryContainer = document.getElementById('libraryContainer');
+            const inputContainer = document.getElementById('inputContainer');
+            
+            if (libraryContainer.classList.contains('active')) {
+                // Show chat
+                libraryContainer.classList.remove('active');
+                chatContainer.classList.remove('hidden');
+                inputContainer.style.display = 'block';
+                document.querySelector('.library-button').textContent = '📚 Insight Library';
+            } else {
+                // Show library
+                libraryContainer.classList.add('active');
+                chatContainer.classList.add('hidden');
+                inputContainer.style.display = 'none';
+                document.querySelector('.library-button').textContent = '💬 Back to Chat';
+                loadInsights();
+            }
+        }
+        
+        // Load insights from localStorage
+        function loadInsights() {
+            const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+            displayInsights(insights);
+        }
+        
+        // Display insights in grid
+        function displayInsights(insights, filter = 'all') {
+            const grid = document.getElementById('insightGrid');
+            
+            // Filter insights
+            const filteredInsights = filter === 'all' 
+                ? insights 
+                : insights.filter(i => i.audience === filter);
+            
+            if (filteredInsights.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No insights found</h3>
+                        <p>${filter === 'all' ? 'Start a conversation and capture your first learning!' : 'No insights for this audience yet.'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = filteredInsights.map((insight, index) => `
+                <div class="insight-card-item" data-index="${index}">
+                    <h4>${insight.problem}</h4>
+                    <p><strong>Solution:</strong> ${insight.solution}</p>
+                    <p><strong>Key Learning:</strong> ${insight.keyLearning}</p>
+                    <div class="insight-card-meta">
+                        <span>${getAudienceLabel(insight.audience)} • ${getConfidenceLabel(insight.confidence)}</span>
+                        <span>${new Date(insight.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <div class="insight-actions">
+                        <button class="action-button" onclick="copyInsight(${index})">📋 Copy</button>
+                        <button class="action-button" onclick="deleteInsight(${index})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filter insights by audience
+        function filterInsights(filter) {
+            const buttons = document.querySelectorAll('.filter-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+            displayInsights(insights, filter);
+        }
+        
+        // Copy insight to clipboard
+        function copyInsight(index) {
+            const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+            const insight = insights[index];
+            if (insight && insight.shareText) {
+                navigator.clipboard.writeText(insight.shareText).then(() => {
+                    showToast('Insight copied to clipboard! 📋');
+                });
+            }
+        }
+        
+        // Delete insight
+        function deleteInsight(index) {
+            if (confirm('Are you sure you want to delete this insight?')) {
+                let insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+                insights.splice(index, 1);
+                localStorage.setItem('menoInsights', JSON.stringify(insights));
+                loadInsights();
+                showToast('Insight deleted');
+            }
+        }
+        
+        // Get audience label
+        function getAudienceLabel(audience) {
+            const labels = {
+                'team': '👥 Team',
+                'future': '🔮 Future Me',
+                'new': '🆕 New Hires'
+            };
+            return labels[audience] || audience;
+        }
+        
+        // Get confidence label
+        function getConfidenceLabel(confidence) {
+            const labels = {
+                'low': '😕',
+                'medium': '🤔',
+                'high': '😊'
+            };
+            return labels[confidence] || '';
+        }
         
         // Set confidence level
         function setConfidence(level) {
@@ -577,6 +1073,32 @@
                 btn.classList.remove('selected');
             });
             event.target.classList.add('selected');
+            checkEnableContinue();
+        }
+        
+        // Validate learning
+        function validateLearning(isValid) {
+            if (isValid) {
+                learningValidated = true;
+                document.getElementById('revisedLearning').style.display = 'none';
+            } else {
+                learningValidated = false;
+                document.getElementById('revisedLearning').style.display = 'block';
+                document.getElementById('revisedLearning').focus();
+            }
+            checkEnableContinue();
+        }
+        
+        // Check if continue button should be enabled
+        function checkEnableContinue() {
+            const continueBtn = document.getElementById('continueBtn');
+            const revisedLearning = document.getElementById('revisedLearning');
+            
+            if (selectedConfidence && (learningValidated || revisedLearning.value.trim())) {
+                continueBtn.disabled = false;
+            } else {
+                continueBtn.disabled = true;
+            }
         }
         
         // Go back to step 1
@@ -602,6 +1124,7 @@
             // Disable input while processing
             input.disabled = true;
             document.getElementById('sendButton').disabled = true;
+            document.getElementById('sendButton').innerHTML = 'Thinking<span class="loading"></span>';
             
             // Add user message
             addMessage(message, 'user');
@@ -610,17 +1133,48 @@
             // Clear input
             input.value = '';
             
-            // Simulate AI response (in production, this would call Claude API)
-            const response = await getAIResponse(message);
-            
-            // Add AI response
-            addMessage(response, 'assistant');
-            conversationHistory.push({ role: 'assistant', content: response });
-            
-            // Re-enable input
-            input.disabled = false;
-            document.getElementById('sendButton').disabled = false;
-            input.focus();
+            try {
+                // Call API
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'chat',
+                        message: message,
+                        conversationHistory: conversationHistory.slice(-10), // Last 10 messages for context
+                        model: getSelectedModel()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to get response');
+                }
+                
+                // Add AI response
+                addMessage(data.response, 'assistant');
+                conversationHistory.push({ role: 'assistant', content: data.response });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                // More specific error messages
+                if (error.message.includes('Unexpected token')) {
+                    addMessage('Error: API endpoint not found. Please check your deployment configuration.', 'assistant');
+                } else if (error.message.includes('Failed to fetch')) {
+                    addMessage('Error: Could not connect to the server. Please check if the API is running.', 'assistant');
+                } else {
+                    addMessage(`Sorry, I encountered an error: ${error.message}`, 'assistant');
+                }
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('sendButton').innerHTML = 'Send';
+                input.focus();
+            }
         }
         
         // Add message to chat
@@ -640,51 +1194,6 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
-        // Simulate AI response (replace with actual Claude API call)
-        async function getAIResponse(message) {
-            // Simulate thinking time
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const lowerMessage = message.toLowerCase();
-            
-            // Context-aware responses
-            if (lowerMessage.includes('slow') || lowerMessage.includes('performance') || lowerMessage.includes('timeout')) {
-                return "Performance issues often stem from inefficient queries or algorithms. Have you checked:\n\n1. Database query efficiency (N+1 queries?)\n2. Caching opportunities\n3. Algorithm complexity\n\nCan you tell me more about what's running slowly?";
-            } 
-            
-            if (lowerMessage.includes('error') || lowerMessage.includes('bug') || lowerMessage.includes('broken')) {
-                return "I can help debug that error. To better assist you:\n\n1. What's the exact error message?\n2. When does it occur?\n3. Have you checked the logs?\n\nShare the error details and I'll help you troubleshoot.";
-            }
-            
-            if (lowerMessage.includes('fix') || lowerMessage.includes('solve') || lowerMessage.includes('solution')) {
-                return "Great question! Based on what you've described, here's a solution:\n\n1. First, identify the root cause\n2. Apply the appropriate fix\n3. Test thoroughly\n4. Document the solution\n\nWould you like me to elaborate on any of these steps?";
-            }
-            
-            if (lowerMessage.includes('api')) {
-                return "API issues can be tricky. Common causes include:\n\n1. Authentication/authorization problems\n2. Rate limiting\n3. Timeout settings\n4. Incorrect request format\n\nWhat specific behavior are you seeing with your API?";
-            }
-            
-            if (lowerMessage.includes('database') || lowerMessage.includes('query') || lowerMessage.includes('sql')) {
-                return "Database performance is crucial. Let's check:\n\n1. Are your queries using proper indexes?\n2. Any N+1 query problems?\n3. Connection pool settings?\n4. Query execution plans?\n\nWhat database system are you using?";
-            }
-            
-            if (lowerMessage.includes('deploy') || lowerMessage.includes('production')) {
-                return "Deployment issues require careful debugging. Consider:\n\n1. Environment variable differences\n2. Database migration status\n3. Build/compilation errors\n4. Server configuration\n\nWhat happens when you try to deploy?";
-            }
-            
-            if (lowerMessage.includes('test') || lowerMessage.includes('testing')) {
-                return "Testing is essential for reliable code. I can help with:\n\n1. Unit test strategies\n2. Integration testing\n3. Test coverage\n4. Mocking and stubbing\n\nWhat aspect of testing are you working on?";
-            }
-            
-            // If discussing a solution or fix
-            if (conversationHistory.length > 2 && (lowerMessage.includes('worked') || lowerMessage.includes('fixed') || lowerMessage.includes('solved'))) {
-                return "Excellent! You've solved the problem. This is a great learning moment.\n\nTo help others who might face this issue:\n1. What was the root cause?\n2. How did you identify it?\n3. What's the key insight here?\n\nConsider clicking '💡 Capture Learning' to document this solution for your team!";
-            }
-            
-            // Default response for unmatched patterns
-            return "I understand. Let me help you with that. Can you provide more details about the specific issue you're facing?";
-        }
-        
         // Start capture flow
         function startCapture() {
             if (conversationHistory.length < 2) {
@@ -700,14 +1209,24 @@
         
         // Prefill capture form based on conversation
         function prefillCapture() {
-            // Simple extraction logic (in production, use AI)
-            const lastMessages = conversationHistory.slice(-4);
+            // Try to extract problem from recent conversation
+            const recentMessages = conversationHistory.slice(-6);
+            const userMessages = recentMessages.filter(m => m.role === 'user');
             
-            // Try to extract problem from user messages
-            const userMessages = lastMessages.filter(m => m.role === 'user');
             if (userMessages.length > 0) {
-                const problemText = userMessages[userMessages.length - 1].content;
-                document.getElementById('problemInput').value = problemText.substring(0, 100);
+                // Use the most relevant user message as a starting point
+                const lastUserMessage = userMessages[userMessages.length - 1].content;
+                
+                // Smart extraction based on keywords
+                if (lastUserMessage.length < 100) {
+                    document.getElementById('problemInput').value = lastUserMessage;
+                } else {
+                    // Extract first sentence or question
+                    const firstSentence = lastUserMessage.match(/^[^.!?]+[.!?]/);
+                    if (firstSentence) {
+                        document.getElementById('problemInput').value = firstSentence[0].trim();
+                    }
+                }
             }
         }
         
@@ -729,99 +1248,175 @@
                 return;
             }
             
-            // Capture form data
-            currentCapture = {
-                audience: selectedAudience,
-                problem: document.getElementById('problemInput').value,
-                cause: document.getElementById('causeInput').value,
-                solution: document.getElementById('solutionInput').value,
-                timestamp: new Date().toISOString()
-            };
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Generating...';
+            submitBtn.disabled = true;
             
-            // Move to AI enhancement step
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step2').classList.add('active');
-            
-            // Generate AI enhancements
-            await performAIAnalysis();
+            try {
+                // Capture form data
+                currentCapture = {
+                    audience: selectedAudience,
+                    problem: document.getElementById('problemInput').value,
+                    cause: document.getElementById('causeInput').value,
+                    solution: document.getElementById('solutionInput').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Move to AI enhancement step
+                document.getElementById('step1').classList.remove('active');
+                document.getElementById('step2').classList.add('active');
+                
+                // Generate AI enhancements
+                await performAIAnalysis();
+            } finally {
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         });
         
         // Perform AI analysis
         async function performAIAnalysis() {
-            // Simulate API calls
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const thinkingIndicator = document.getElementById('thinkingIndicator');
+            thinkingIndicator.classList.add('show');
             
-            // Update AI analysis
-            document.getElementById('aiAnalysis').innerHTML = 
-                "✅ Your summary aligns well with the conversation. The problem and solution are clearly articulated.";
-            
-            // Generate audience-specific Socratic question
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'analyze',
+                        conversationHistory: conversationHistory.slice(-10),
+                        captureData: currentCapture,
+                        model: getSelectedModel()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to analyze');
+                }
+                
+                aiAnalysisData = data;
+                
+                // Update UI with analysis
+                document.getElementById('aiAnalysis').innerHTML = 
+                    data.alignment || "✅ Your summary captures the key points well.";
+                
+                document.getElementById('socraticQuestion').textContent = 
+                    data.socraticQuestion || "What patterns might help prevent similar issues?";
+                
+                document.getElementById('keyLearning').textContent = 
+                    data.keyLearning || "Understanding root causes leads to better solutions.";
+                
+                currentCapture.socraticQuestion = data.socraticQuestion;
+                currentCapture.keyLearning = data.keyLearning;
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                // Check if it's an HTML response (404 error)
+                if (error.message.includes('Unexpected token')) {
+                    console.error('API endpoint returned HTML instead of JSON - check your API route configuration');
+                }
+                // Fallback to local analysis
+                performLocalAnalysis();
+            } finally {
+                thinkingIndicator.classList.remove('show');
+            }
+        }
+        
+        // Fallback local analysis
+        function performLocalAnalysis() {
             const audienceContext = {
                 'team': {
-                    context: "your team might ask at standup",
+                    context: "your team might ask",
                     questions: [
-                        "What happens if this same issue occurs in our microservices?",
-                        "How can we prevent this from happening in other endpoints?",
-                        "What's the performance impact we should expect?",
-                        "Should we add monitoring for this pattern?"
+                        "How can we prevent this from happening again?",
+                        "What's the impact on our other systems?",
+                        "Should we add monitoring for this?"
                     ]
                 },
                 'future': {
-                    context: "you might ask yourself in 6 months",
+                    context: "you might ask yourself later",
                     questions: [
-                        "What were the specific symptoms that led to this diagnosis?",
-                        "What tools or commands did I use to identify this?",
-                        "Are there any edge cases I should remember?",
-                        "What would I check first if this happens again?"
+                        "What were the exact steps to reproduce this?",
+                        "What tools did I use to diagnose this?",
+                        "Are there edge cases I should remember?"
                     ]
                 },
                 'new': {
-                    context: "a new hire might ask during onboarding",
+                    context: "someone new might ask",
                     questions: [
-                        "What background knowledge is needed to understand this fix?",
-                        "Are there any documentation or resources about this pattern?",
-                        "What's the difference between the broken and fixed approaches?",
-                        "How common is this type of issue in our codebase?"
+                        "What background knowledge is needed here?",
+                        "Where can I learn more about this?",
+                        "How common is this type of issue?"
                     ]
                 }
             };
             
-            const audience = selectedAudience || 'team';
-            const contextInfo = audienceContext[audience];
-            const randomQuestion = contextInfo.questions[Math.floor(Math.random() * contextInfo.questions.length)];
+            const context = audienceContext[currentCapture.audience];
+            const question = context.questions[Math.floor(Math.random() * context.questions.length)];
             
-            const socraticIntro = `Good fix! Here's something ${contextInfo.context}:\n\n"${randomQuestion}"\n\nHow might you answer it?`;
+            document.getElementById('aiAnalysis').innerHTML = 
+                "✅ Your summary captures the problem and solution clearly.";
             
-            document.getElementById('socraticQuestion').textContent = socraticIntro;
-            currentCapture.socraticQuestion = randomQuestion;
+            document.getElementById('socraticQuestion').textContent = 
+                `Good work! Here's something ${context.context}: "${question}"`;
             
-            // Generate key learning
             document.getElementById('keyLearning').textContent = 
-                "Always investigate root causes before implementing solutions - symptoms often mask deeper issues.";
+                "Document your learnings to help yourself and others solve problems faster.";
             
+            currentCapture.socraticQuestion = question;
             currentCapture.keyLearning = document.getElementById('keyLearning').textContent;
         }
         
         // Show share card
         function showShareCard() {
+            // Get final key learning
+            const revisedLearning = document.getElementById('revisedLearning').value.trim();
+            if (revisedLearning) {
+                currentCapture.keyLearning = revisedLearning;
+            }
+            
+            // Get Socratic response if provided
+            const socraticResponse = document.getElementById('socraticResponse').value.trim();
+            
+            // Store confidence
+            currentCapture.confidence = selectedConfidence;
+            
+            const confidenceEmoji = {
+                'low': '😕 Still learning',
+                'medium': '🤔 Somewhat confident',
+                'high': '😊 Very confident'
+            }[selectedConfidence];
+            
             const audienceEmoji = {
                 'team': '👥 Team',
                 'future': '🔮 Future Reference',
                 'new': '🆕 New Hire Guide'
-            };
+            }[currentCapture.audience];
             
-            const shareText = `🐛 Debug Win
+            let shareText = `💡 Learning Insight - For: ${audienceEmoji}
 
 **Problem:** ${currentCapture.problem}
 **Cause:** ${currentCapture.cause}
 **Solution:** ${currentCapture.solution}
 
-💡 **Key Learning:** ${currentCapture.keyLearning}
+**Key Learning:** ${currentCapture.keyLearning}`;
+            
+            if (socraticResponse) {
+                shareText += `\n\n**Reflection:** "${currentCapture.socraticQuestion}"
+${socraticResponse}`;
+            }
+            
+            shareText += `\n\n📊 Confidence: ${confidenceEmoji}
 
-🤔 **Consider:** ${currentCapture.socraticQuestion}
-
-📝 **Audience:** ${audienceEmoji[currentCapture.audience] || 'Team'}
-⏱️ **Captured:** ${new Date().toLocaleDateString()}`;
+- ${new Date().toLocaleDateString()}`;
             
             document.getElementById('shareCard').textContent = shareText;
             currentCapture.shareText = shareText;
@@ -835,26 +1430,55 @@
         function copyToClipboard() {
             navigator.clipboard.writeText(currentCapture.shareText).then(() => {
                 showToast('Copied to clipboard! 📋');
-                setTimeout(() => {
-                    closeModal();
-                }, 1500);
             });
+        }
+        
+        // Save and close
+        function saveAndClose() {
+            // Save to localStorage
+            let insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+            insights.unshift(currentCapture); // Add to beginning
+            
+            // Keep only last 100 insights
+            if (insights.length > 100) {
+                insights = insights.slice(0, 100);
+            }
+            
+            localStorage.setItem('menoInsights', JSON.stringify(insights));
+            
+            showToast('Insight saved to library! 💾');
+            setTimeout(() => {
+                closeModal();
+            }, 1000);
         }
         
         // Close modal
         function closeModal() {
             document.getElementById('modalContainer').classList.remove('show');
+            
             // Reset form
             document.getElementById('captureForm').reset();
             document.querySelectorAll('.audience-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
+            document.querySelectorAll('.confidence-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
             // Reset steps
             document.querySelectorAll('.modal-step').forEach(step => {
                 step.classList.remove('active');
             });
             document.getElementById('step1').classList.add('active');
+            
+            // Reset variables
             selectedAudience = '';
+            selectedConfidence = '';
+            learningValidated = false;
+            document.getElementById('revisedLearning').style.display = 'none';
+            document.getElementById('revisedLearning').value = '';
+            document.getElementById('socraticResponse').value = '';
+            document.getElementById('continueBtn').disabled = true;
         }
         
         // Show toast notification
@@ -874,6 +1498,9 @@
                 closeModal();
             }
         });
+        
+        // Listen for changes to enable continue button
+        document.getElementById('revisedLearning').addEventListener('input', checkEnableContinue);
     </script>
 </body>
 </html>
