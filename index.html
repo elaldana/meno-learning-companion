@@ -626,6 +626,83 @@
             border-color: #6366f1;
         }
         
+        .input-with-assist {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        
+        .input-with-assist input,
+        .input-with-assist textarea {
+            flex: 1;
+        }
+        
+        .meno-assist-btn {
+            padding: 8px 12px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            color: #0ea5e9;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .meno-assist-btn:hover {
+            background: #0ea5e9;
+            color: white;
+        }
+        
+        .meno-assist-btn:disabled {
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .meno-suggestions {
+            margin-top: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.5;
+            display: none;
+        }
+        
+        .meno-suggestions.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .meno-suggestions h5 {
+            margin: 0 0 8px 0;
+            color: #0ea5e9;
+            font-size: 13px;
+        }
+        
+        .meno-suggestions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .meno-suggestions li {
+            margin-bottom: 6px;
+            color: #475569;
+        }
+        
+        .meno-suggestions .suggestion-example {
+            background: #e0f2fe;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-style: italic;
+            color: #0c4a6e;
+        }
+        
         /* AI Enhancement */
         .ai-section {
             margin-bottom: 24px;
@@ -1017,15 +1094,33 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 <form id="captureForm">
                     <div class="form-group">
                         <label>What was the problem?</label>
-                        <input type="text" id="problemInput" required>
+                        <div class="input-with-assist">
+                            <input type="text" id="problemInput" required>
+                            <button type="button" class="meno-assist-btn" onclick="getMenoAssist('problem')" title="Get AI suggestions based on conversation">
+                                🤖 Meno Assist
+                            </button>
+                        </div>
+                        <div class="meno-suggestions" id="problemSuggestions"></div>
                     </div>
                     <div class="form-group">
                         <label>What was its cause?</label>
-                        <input type="text" id="causeInput" required>
+                        <div class="input-with-assist">
+                            <input type="text" id="causeInput" required>
+                            <button type="button" class="meno-assist-btn" onclick="getMenoAssist('cause')" title="Get AI suggestions based on conversation">
+                                🤖 Meno Assist
+                            </button>
+                        </div>
+                        <div class="meno-suggestions" id="causeSuggestions"></div>
                     </div>
                     <div class="form-group">
                         <label>What was the solution?</label>
-                        <textarea id="solutionInput" rows="3" required></textarea>
+                        <div class="input-with-assist">
+                            <textarea id="solutionInput" rows="3" required></textarea>
+                            <button type="button" class="meno-assist-btn" onclick="getMenoAssist('solution')" title="Get AI suggestions based on conversation">
+                                🤖 Meno Assist
+                            </button>
+                        </div>
+                        <div class="meno-suggestions" id="solutionSuggestions"></div>
                     </div>
                     <div class="button-group">
                         <button type="submit" class="btn btn-primary">Generate Card</button>
@@ -1619,6 +1714,185 @@ When you solve something interesting or learn something new, click the "💡 Cap
                     }
                 }
             }
+        }
+        
+        // Get Meno Assist suggestions for form fields
+        async function getMenoAssist(fieldType) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = '🤔 Thinking...';
+            
+            try {
+                const suggestions = await generateMenoSuggestions(fieldType);
+                displayMenoSuggestions(fieldType, suggestions);
+            } catch (error) {
+                console.error('Meno Assist error:', error);
+                showToast('Unable to generate suggestions. Please try again.');
+            } finally {
+                // Reset button
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
+        // Generate AI suggestions for form fields
+        async function generateMenoSuggestions(fieldType) {
+            const recentMessages = conversationHistory.slice(-8);
+            
+            const fieldPrompts = {
+                'problem': {
+                    title: 'Problem Identification',
+                    prompt: `Based on this conversation, help the user identify the core problem they solved. 
+                    
+                    Provide:
+                    1. 2-3 specific questions to help them think about what the problem really was
+                    2. 1-2 example problem statements they could use as a template
+                    3. Tips for writing a clear, specific problem description
+                    
+                    Focus on helping them articulate their own understanding, not giving them the answer.`
+                },
+                'cause': {
+                    title: 'Root Cause Analysis',
+                    prompt: `Based on this conversation, help the user identify the underlying cause of their problem.
+                    
+                    Provide:
+                    1. 2-3 questions to help them think about why this problem occurred
+                    2. 1-2 example cause statements they could use as a template
+                    3. Tips for distinguishing between symptoms and root causes
+                    
+                    Help them think deeper about causality, not just surface-level issues.`
+                },
+                'solution': {
+                    title: 'Solution Documentation',
+                    prompt: `Based on this conversation, help the user document their solution effectively.
+                    
+                    Provide:
+                    1. 2-3 questions to help them think about what made their solution work
+                    2. 1-2 example solution descriptions they could use as a template
+                    3. Tips for writing actionable, reusable solution steps
+                    
+                    Focus on helping them capture the key steps and reasoning, not just the final answer.`
+                }
+            };
+            
+            const fieldInfo = fieldPrompts[fieldType];
+            
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'menoAssist',
+                        conversationHistory: recentMessages,
+                        fieldType: fieldType,
+                        prompt: fieldInfo.prompt,
+                        model: getSelectedModel()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate suggestions');
+                }
+                
+                return {
+                    title: fieldInfo.title,
+                    suggestions: data.suggestions || [],
+                    questions: data.questions || [],
+                    tips: data.tips || [],
+                    example: data.example || ''
+                };
+                
+            } catch (error) {
+                console.error('API error:', error);
+                // Fallback to local suggestions
+                return generateLocalSuggestions(fieldType);
+            }
+        }
+        
+        // Generate local fallback suggestions
+        function generateLocalSuggestions(fieldType) {
+            const localSuggestions = {
+                'problem': {
+                    title: 'Problem Identification',
+                    questions: [
+                        "What was the main issue you were trying to solve?",
+                        "What was the impact of this problem?",
+                        "What made this problem challenging or interesting?"
+                    ],
+                    tips: [
+                        "Be specific about what wasn't working",
+                        "Include context about when/where this happened",
+                        "Focus on the core issue, not symptoms"
+                    ],
+                    example: "Example: 'The login form was rejecting valid credentials due to incorrect password hashing comparison'"
+                },
+                'cause': {
+                    title: 'Root Cause Analysis',
+                    questions: [
+                        "Why did this problem occur in the first place?",
+                        "What underlying conditions led to this issue?",
+                        "What assumptions or dependencies were involved?"
+                    ],
+                    tips: [
+                        "Look beyond immediate triggers",
+                        "Consider system design, configuration, or process issues",
+                        "Think about what could have prevented this"
+                    ],
+                    example: "Example: 'The password comparison was using string comparison instead of secure hash comparison, likely due to legacy code migration'"
+                },
+                'solution': {
+                    title: 'Solution Documentation',
+                    questions: [
+                        "What steps did you take to solve this?",
+                        "What was the key insight that led to the solution?",
+                        "What tools or resources were most helpful?"
+                    ],
+                    tips: [
+                        "Include the reasoning behind your approach",
+                        "Mention any false starts or dead ends",
+                        "Focus on reusable patterns or techniques"
+                    ],
+                    example: "Example: 'Replaced string comparison with bcrypt.compare() and added unit tests to verify the fix. The key was understanding that password hashes can't be compared directly.'"
+                }
+            };
+            
+            return localSuggestions[fieldType];
+        }
+        
+        // Display Meno suggestions in the UI
+        function displayMenoSuggestions(fieldType, suggestions) {
+            const container = document.getElementById(`${fieldType}Suggestions`);
+            
+            let html = `
+                <h5>🤖 ${suggestions.title} - AI Suggestions</h5>
+                <p><strong>Questions to help you think:</strong></p>
+                <ul>
+                    ${suggestions.questions.map(q => `<li>${q}</li>`).join('')}
+                </ul>
+                <p><strong>Writing tips:</strong></p>
+                <ul>
+                    ${suggestions.tips.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            `;
+            
+            if (suggestions.example) {
+                html += `<div class="suggestion-example">${suggestions.example}</div>`;
+            }
+            
+            container.innerHTML = html;
+            container.classList.add('show');
+            
+            // Auto-hide after 30 seconds
+            setTimeout(() => {
+                container.classList.remove('show');
+            }, 30000);
         }
         
         // Select audience

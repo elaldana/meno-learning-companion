@@ -41,6 +41,8 @@ export default async function handler(req, res) {
         return handleChat(req, res, message, conversationHistory);
       case 'analyze':
         return handleAnalyze(req, res, conversationHistory, captureData);
+      case 'menoAssist':
+        return handleMenoAssist(req, res, conversationHistory, req.body.fieldType, req.body.prompt);
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -230,5 +232,88 @@ Format your response as JSON with these fields:
   } catch (error) {
     console.error('Error in handleAnalyze:', error);
     return res.status(500).json({ error: 'Failed to analyze capture' });
+  }
+}
+
+// Handle Meno Assist suggestions for form fields
+async function handleMenoAssist(req, res, conversationHistory, fieldType, customPrompt) {
+  if (!fieldType) {
+    return res.status(400).json({ error: 'Field type is required' });
+  }
+  
+  // Get model from request or use default
+  const model = req.body.model || 'claude-3-5-sonnet-20241022';
+  
+  try {
+    // Create the assist prompt
+    const assistPrompt = `${customPrompt}
+
+Conversation context:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+Please provide your response in this exact JSON format:
+{
+  "questions": ["question 1", "question 2", "question 3"],
+  "tips": ["tip 1", "tip 2", "tip 3"],
+  "example": "A concrete example they could use as a template"
+}
+
+Focus on helping them think through their own understanding, not providing the answer directly.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.CLAUDE_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 800,
+        messages: [
+          {
+            role: 'user',
+            content: assistPrompt
+          }
+        ]
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('Claude API error:', data);
+      return res.status(500).json({ error: 'Failed to generate suggestions' });
+    }
+    
+    // Parse the JSON response
+    try {
+      if (data.content && data.content[0] && data.content[0].text) {
+        const suggestions = JSON.parse(data.content[0].text);
+        return res.status(200).json(suggestions);
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      console.error('Raw response:', data);
+      // Return fallback suggestions if parsing fails
+      return res.status(200).json({
+        questions: [
+          "What was the main issue you were trying to solve?",
+          "What made this problem challenging or interesting?",
+          "What was the impact of this problem?"
+        ],
+        tips: [
+          "Be specific about what wasn't working",
+          "Include context about when/where this happened",
+          "Focus on the core issue, not symptoms"
+        ],
+        example: "Example: 'The login form was rejecting valid credentials due to incorrect password hashing comparison'"
+      });
+    }
+  } catch (error) {
+    console.error('Error in handleMenoAssist:', error);
+    return res.status(500).json({ error: 'Failed to generate suggestions' });
   }
 }

@@ -366,7 +366,7 @@ Example card:
 
 ## Overview
 
-The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 8 different types of prompts across AI interactions, user interfaces, and fallback scenarios.
+The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 12 different types of prompts across AI interactions, user interfaces, fallback scenarios, and form assistance features.
 
 ## AI System Prompts
 
@@ -526,6 +526,97 @@ questions: [
 - Addresses common new hire concerns
 - Focuses on practical troubleshooting steps
 - Emphasizes knowledge discovery and documentation
+
+## Meno Assist Prompts
+
+### 9. Problem Identification Assist Prompt
+**Purpose**: Helps users articulate the core problem they solved
+**Location**: `index.html` (lines 1820-1830)
+**Usage**: When users click "Meno Assist" for problem field
+
+```javascript
+prompt: `Based on this conversation, help the user identify the core problem they solved. 
+        
+Provide:
+1. 2-3 specific questions to help them think about what the problem really was
+2. 1-2 example problem statements they could use as a template
+3. Tips for writing a clear, specific problem description
+
+Focus on helping them articulate their own understanding, not giving them the answer.`
+```
+
+**Design Rationale**:
+- Guides users to think deeper about problem definition
+- Provides scaffolding without giving direct answers
+- Emphasizes clarity and specificity in problem articulation
+
+### 10. Root Cause Analysis Assist Prompt
+**Purpose**: Helps users identify underlying causes of problems
+**Location**: `index.html` (lines 1831-1841)
+**Usage**: When users click "Meno Assist" for cause field
+
+```javascript
+prompt: `Based on this conversation, help the user identify the underlying cause of their problem.
+        
+Provide:
+1. 2-3 questions to help them think about why this problem occurred
+2. 1-2 example cause statements they could use as a template
+3. Tips for distinguishing between symptoms and root causes
+
+Help them think deeper about causality, not just surface-level issues.`
+```
+
+**Design Rationale**:
+- Encourages deeper causal thinking
+- Distinguishes between symptoms and root causes
+- Provides frameworks for systematic analysis
+
+### 11. Solution Documentation Assist Prompt
+**Purpose**: Helps users document their solution effectively
+**Location**: `index.html` (lines 1842-1852)
+**Usage**: When users click "Meno Assist" for solution field
+
+```javascript
+prompt: `Based on this conversation, help the user document their solution effectively.
+        
+Provide:
+1. 2-3 questions to help them think about what made their solution work
+2. 1-2 example solution descriptions they could use as a template
+3. Tips for writing actionable, reusable solution steps
+
+Focus on helping them capture the key steps and reasoning, not just the final answer.`
+```
+
+**Design Rationale**:
+- Emphasizes actionable, reusable documentation
+- Focuses on process and reasoning, not just outcomes
+- Helps users create templates for future problem-solving
+
+### 12. Meno Assist API Prompt
+**Purpose**: Structures AI responses for form field assistance
+**Location**: `api/chat.js` (lines 280-290)
+**Usage**: Backend processing of Meno Assist requests
+
+```javascript
+const assistPrompt = `${customPrompt}
+
+Conversation context:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+Please provide your response in this exact JSON format:
+{
+  "questions": ["question 1", "question 2", "question 3"],
+  "tips": ["tip 1", "tip 2", "tip 3"],
+  "example": "A concrete example they could use as a template"
+}
+
+Focus on helping them think through their own understanding, not providing the answer directly.`;
+```
+
+**Design Rationale**:
+- Ensures consistent JSON response format for reliable parsing
+- Maintains focus on guidance rather than direct answers
+- Provides conversation context for relevant suggestions
 
 ## Prompt Design Principles
 
