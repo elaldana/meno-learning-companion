@@ -30,13 +30,14 @@ Create a simple tool that makes capturing and sharing AI-assisted problem soluti
 
 ### In Scope
 - Manual capture trigger (floating button)
-- Simple 3-question form
-- **AI-powered Socratic follow-up question**
+- **Enhanced 3-question form with AI assistance (Meno Assist)**
+- **AI-powered Socratic follow-up question with response guidance**
 - **AI-generated key learning with validation**
-- **Self-reflection rating**
+- **Self-reflection confidence rating (Still Learning/Somewhat Confident/Very Confident)**
 - Local browser storage
 - Copy-to-clipboard sharing
-- Basic capture history view
+- **Advanced Insight Library with dual filtering and detailed views**
+- **Comprehensive insight detail modal with conversation history**
 
 ### Out of Scope (Future)
 - Automatic problem/solution detection
@@ -78,19 +79,25 @@ Simple modal appears with audience selection:
 [Select one or more]
 ```
 
-Modal then presents three questions:
+Modal then presents three questions with AI assistance:
 ```
 What was the problem?
-[Text input with context from conversation]
+[Text input with 🤖 Meno Assist button]
 
 What was its cause?
-[Text input]
+[Text input with 🤖 Meno Assist button]
 
 What was the solution?
-[Text input]
+[Text area with 🤖 Meno Assist button]
 
 [Generate Card] [Cancel]
 ```
+
+**Meno Assist Feature**: Each form field includes an AI-powered assistance button that provides:
+- Contextual questions to help users think deeper
+- Writing tips for better articulation
+- Example templates based on the conversation
+- Guidance without giving direct answers
 
 ### 4. AI-Enhanced Learning
 Claude API performs comprehensive analysis:
@@ -105,8 +112,13 @@ Claude API performs comprehensive analysis:
 Based on your discussion about [specific topic], here's a deeper question:
 "[Contextual question that promotes interaction and learning]"
 
-[User's response - encouraged to deepen understanding]
+[User's response with 🤖 Meno Assist button - encouraged to deepen understanding]
 ```
+
+**Socratic Response Assistance**: Users can click "🤖 Meno Assist" to get guidance on how to respond to the audience question, including:
+- Questions about what their audience really wants to know
+- Tips for educational responses that help others learn
+- Example response structures and analogies
 
 **C) Key Learning Generation:**
 ```
@@ -157,11 +169,41 @@ Example card:
 ### 6. Store and Share Insight Card
 - **Copy to Clipboard**: One-click sharing to Slack/Teams/Email
 - **Insight Library**: 
-  - Cards stored chronologically
-  - Filterable by audience, confidence level, or date
-  - Each card can be viewed, edited, shared, or deleted
-  - Search functionality for finding past insights
-- **Quick Actions**: Share, duplicate, or delete from library view
+  - Cards stored chronologically with enhanced information display
+  - **Dual Filtering System**: Filter by audience (Team/Future Me/New Hires) AND confidence level (Still Learning/Somewhat Confident/Very Confident)
+  - **Enhanced Cards**: Display problem, cause, solution, key learning, confidence level, and date
+  - **Detailed View**: Click any card to see full insight details including conversation history
+  - **Quick Actions**: Copy, delete, or view detailed insights from library
+  - **Filter Summary**: Visual display of active filters with easy clear option
+- **Insight Detail Modal**: Comprehensive view showing full problem, solution, conversation context, and learning journey
+
+## Enhanced Features
+
+### Meno Assist - AI-Powered Form Assistance
+**Purpose**: Help users write better problem, cause, and solution descriptions
+**Features**:
+- **Contextual Guidance**: AI analyzes conversation to provide relevant suggestions
+- **Scaffolding Approach**: Questions and tips help users think deeper without giving direct answers
+- **Field-Specific Prompts**: Different assistance for problem identification, root cause analysis, and solution documentation
+- **Socratic Response Guidance**: Special assistance for responding to audience questions
+- **Fallback Support**: Local suggestions when AI is unavailable
+
+### Advanced Insight Library
+**Purpose**: Enhanced organization and discovery of captured learnings
+**Features**:
+- **Dual Filtering System**: Filter by both audience type and confidence level simultaneously
+- **Enhanced Card Display**: Shows problem, cause, solution, key learning, confidence, and date
+- **Detailed View Modal**: Comprehensive insight view with full conversation history
+- **Filter Summary**: Visual display of active filters with one-click clear option
+- **Responsive Design**: Clean, modern interface that works on all devices
+
+### Confidence-Based Learning
+**Purpose**: Help users track and improve their understanding over time
+**Features**:
+- **Three Confidence Levels**: Still Learning, Somewhat Confident, Very Confident
+- **Learning Progression**: Track how confidence changes over time
+- **Filtered Views**: Find insights by confidence level for targeted review
+- **Self-Assessment**: Encourages metacognitive awareness of knowledge gaps
 
 ## Example Learning Scenarios
 
