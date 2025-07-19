@@ -246,10 +246,18 @@ async function handleMenoAssist(req, res, conversationHistory, fieldType, custom
   
   try {
     // Create the assist prompt
-    const assistPrompt = `${customPrompt}
+    let assistPrompt = `${customPrompt}
 
 Conversation context:
-${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}`;
+
+    // Add Socratic question context if available
+    if (fieldType === 'socratic' && req.body.socraticQuestion) {
+      assistPrompt += `\n\nSocratic question to respond to:
+"${req.body.socraticQuestion}"`;
+    }
+
+    assistPrompt += `
 
 Please provide your response in this exact JSON format:
 {

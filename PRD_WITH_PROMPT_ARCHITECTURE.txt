@@ -366,7 +366,7 @@ Example card:
 
 ## Overview
 
-The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 12 different types of prompts across AI interactions, user interfaces, fallback scenarios, and form assistance features.
+The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 13 different types of prompts across AI interactions, user interfaces, fallback scenarios, and form assistance features.
 
 ## AI System Prompts
 
@@ -617,6 +617,27 @@ Focus on helping them think through their own understanding, not providing the a
 - Ensures consistent JSON response format for reliable parsing
 - Maintains focus on guidance rather than direct answers
 - Provides conversation context for relevant suggestions
+
+### 13. Socratic Response Assist Prompt
+**Purpose**: Helps users think through how to respond to audience questions
+**Location**: `index.html` (lines 1842-1852)
+**Usage**: When users click "Meno Assist" for Socratic response field
+
+```javascript
+prompt: `Based on this conversation and the Socratic question, help the user think through how they would respond to their audience's question.
+        
+Provide:
+1. 2-3 questions to help them think about what their audience really wants to know
+2. 1-2 example response structures they could use as a template
+3. Tips for responding in a way that helps their audience learn and understand
+
+Focus on helping them think about the social and educational aspects of their response, not just the technical details.`
+```
+
+**Design Rationale**:
+- Enhances social learning by helping users think about audience needs
+- Encourages educational responses that help others learn
+- Balances technical accuracy with pedagogical effectiveness
 
 ## Prompt Design Principles
 

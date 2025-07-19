@@ -1145,7 +1145,13 @@ When you solve something interesting or learn something new, click the "💡 Cap
                     <div class="socratic-question" id="socraticQuestion">
                         Generating contextual question...
                     </div>
-                    <textarea class="socratic-response" id="socraticResponse" placeholder="How would you respond to this question? (optional)..." rows="3"></textarea>
+                    <div class="input-with-assist">
+                        <textarea class="socratic-response" id="socraticResponse" placeholder="How would you respond to this question? (optional)..." rows="3"></textarea>
+                        <button type="button" class="meno-assist-btn" onclick="getMenoAssist('socratic')" title="Get AI suggestions for responding to this question">
+                            🤖 Meno Assist
+                        </button>
+                    </div>
+                    <div class="meno-suggestions" id="socraticSuggestions"></div>
                 </div>
                 
                 <div class="ai-section">
@@ -1775,24 +1781,45 @@ When you solve something interesting or learn something new, click the "💡 Cap
                     3. Tips for writing actionable, reusable solution steps
                     
                     Focus on helping them capture the key steps and reasoning, not just the final answer.`
+                },
+                'socratic': {
+                    title: 'Socratic Response Guidance',
+                    prompt: `Based on this conversation and the Socratic question, help the user think through how they would respond to their audience's question.
+                    
+                    Provide:
+                    1. 2-3 questions to help them think about what their audience really wants to know
+                    2. 1-2 example response structures they could use as a template
+                    3. Tips for responding in a way that helps their audience learn and understand
+                    
+                    Focus on helping them think about the social and educational aspects of their response, not just the technical details.`
                 }
             };
             
             const fieldInfo = fieldPrompts[fieldType];
             
             try {
+                const requestBody = {
+                    action: 'menoAssist',
+                    conversationHistory: recentMessages,
+                    fieldType: fieldType,
+                    prompt: fieldInfo.prompt,
+                    model: getSelectedModel()
+                };
+                
+                // Add Socratic question context if available
+                if (fieldType === 'socratic') {
+                    const socraticQuestion = document.getElementById('socraticQuestion').textContent;
+                    if (socraticQuestion && socraticQuestion !== 'Generating contextual question...') {
+                        requestBody.socraticQuestion = socraticQuestion;
+                    }
+                }
+                
                 const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        action: 'menoAssist',
-                        conversationHistory: recentMessages,
-                        fieldType: fieldType,
-                        prompt: fieldInfo.prompt,
-                        model: getSelectedModel()
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const data = await response.json();
@@ -1860,6 +1887,20 @@ When you solve something interesting or learn something new, click the "💡 Cap
                         "Focus on reusable patterns or techniques"
                     ],
                     example: "Example: 'Replaced string comparison with bcrypt.compare() and added unit tests to verify the fix. The key was understanding that password hashes can't be compared directly.'"
+                },
+                'socratic': {
+                    title: 'Socratic Response Guidance',
+                    questions: [
+                        "What does your audience really want to understand?",
+                        "How can you explain this in a way that helps them learn?",
+                        "What context or background might they need?"
+                    ],
+                    tips: [
+                        "Start with the big picture before diving into details",
+                        "Use analogies or examples they can relate to",
+                        "Explain your reasoning, not just the solution"
+                    ],
+                    example: "Example: 'Think of it like this: the system was checking passwords like comparing two different languages. We needed to translate them to the same format first. Here's how we fixed it...'"
                 }
             };
             
