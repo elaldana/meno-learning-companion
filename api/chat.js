@@ -70,16 +70,7 @@ async function handleChat(req, res, message, conversationHistory) {
   
   try {
     // Build messages array with conversation history
-    const messages = [
-      {
-        role: 'system',
-        content: `You are Meno, an AI assistant named after the character in Plato's dialogue about learning. 
-        You help people solve problems through thoughtful questioning and clear explanations. 
-        You work with all kinds of users - students, professionals, researchers, and lifelong learners.
-        Be concise, helpful, and encouraging. When users solve problems, encourage them to capture their learnings.
-        Use the Socratic method when appropriate to deepen understanding.`
-      }
-    ];
+    const messages = [];
     
     // Add conversation history
     if (conversationHistory && conversationHistory.length > 0) {
@@ -109,6 +100,11 @@ async function handleChat(req, res, message, conversationHistory) {
       body: JSON.stringify({
         model: model,
         max_tokens: 1000,
+        system: `You are Meno, an AI assistant named after the character in Plato's dialogue about learning. 
+        You help people solve problems through thoughtful questioning and clear explanations. 
+        You work with all kinds of users - students, professionals, researchers, and lifelong learners.
+        Be concise, helpful, and encouraging. When users solve problems, encourage them to capture their learnings.
+        Use the Socratic method when appropriate to deepen understanding.`,
         messages: messages
       })
     });
