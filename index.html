@@ -100,18 +100,19 @@
             display: block;
         }
         
-        .chat-container.hidden {
-            display: none;
-        }
+
         
         /* Library View */
         .library-container {
-            flex: 1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #f8f9fa;
             overflow-y: auto;
             padding: 24px;
-            max-width: 1000px;
-            width: 100%;
-            margin: 0 auto;
+            z-index: 10;
             display: none;
         }
         
@@ -1270,18 +1271,21 @@ When you solve something interesting or learn something new, click the "💡 Cap
             const chatContainer = document.getElementById('chatContainer');
             const libraryContainer = document.getElementById('libraryContainer');
             const inputContainer = document.getElementById('inputContainer');
+            const captureButton = document.querySelector('.capture-button');
             
             if (libraryContainer.classList.contains('active')) {
                 // Show chat
                 libraryContainer.classList.remove('active');
-                chatContainer.classList.remove('hidden');
+                chatContainer.style.display = 'block';
                 inputContainer.style.display = 'block';
+                captureButton.style.display = 'block';
                 document.querySelector('.library-button').textContent = '📚 Insight Library';
             } else {
                 // Show library
                 libraryContainer.classList.add('active');
-                chatContainer.classList.add('hidden');
+                chatContainer.style.display = 'none';
                 inputContainer.style.display = 'none';
+                captureButton.style.display = 'none';
                 document.querySelector('.library-button').textContent = '💬 Back to Chat';
                 loadInsights();
             }
