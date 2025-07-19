@@ -712,6 +712,59 @@
             border-radius: 8px;
         }
         
+        .analysis-headline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .analysis-headline.excellent {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .analysis-headline.good {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .analysis-headline.fair {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .analysis-headline.needs-improvement {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .headline-icon {
+            font-size: 18px;
+        }
+        
+        .headline-text {
+            flex: 1;
+        }
+        
+        .analysis-details {
+            margin-top: 8px;
+        }
+        
+        .analysis-details p {
+            margin: 0;
+            line-height: 1.5;
+            color: #374151;
+        }
+        
         .ai-section h4 {
             margin: 0 0 12px 0;
             font-size: 16px;
@@ -1137,7 +1190,13 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 
                 <div class="ai-section">
                     <h4>🤖 AI Analysis</h4>
-                    <p id="aiAnalysis">Analyzing your conversation context...</p>
+                    <div class="analysis-headline" id="analysisHeadline">
+                        <span class="headline-icon">📊</span>
+                        <span class="headline-text">Analyzing your summary...</span>
+                    </div>
+                    <div class="analysis-details" id="aiAnalysis">
+                        <p>Analyzing your conversation context...</p>
+                    </div>
                 </div>
                 
                 <div class="ai-section">
@@ -1710,6 +1769,46 @@ When you solve something interesting or learn something new, click the "💡 Cap
             document.getElementById('solutionInput').value = '';
         }
         
+        // Update analysis headline based on AI assessment
+        function updateAnalysisHeadline(alignmentText) {
+            const headline = document.getElementById('analysisHeadline');
+            const headlineText = headline.querySelector('.headline-text');
+            const headlineIcon = headline.querySelector('.headline-icon');
+            
+            // Remove existing classes
+            headline.className = 'analysis-headline';
+            
+            // Determine assessment based on keywords in the alignment text
+            const text = alignmentText.toLowerCase();
+            
+            if (text.includes('excellent') || text.includes('perfect') || text.includes('outstanding') || 
+                text.includes('comprehensive') || text.includes('thorough') || text.includes('well-captured')) {
+                headline.classList.add('excellent');
+                headlineIcon.textContent = '🏆';
+                headlineText.textContent = 'Excellent Summary!';
+            } else if (text.includes('good') || text.includes('solid') || text.includes('clear') || 
+                       text.includes('captures') || text.includes('well') || text.includes('effective')) {
+                headline.classList.add('good');
+                headlineIcon.textContent = '✅';
+                headlineText.textContent = 'Good Summary';
+            } else if (text.includes('fair') || text.includes('adequate') || text.includes('basic') || 
+                       text.includes('could be better') || text.includes('missing some')) {
+                headline.classList.add('fair');
+                headlineIcon.textContent = '⚠️';
+                headlineText.textContent = 'Fair Summary - Room for Improvement';
+            } else if (text.includes('poor') || text.includes('missing') || text.includes('incomplete') || 
+                       text.includes('needs work') || text.includes('lacks') || text.includes('unclear')) {
+                headline.classList.add('needs-improvement');
+                headlineIcon.textContent = '❌';
+                headlineText.textContent = 'Needs Improvement';
+            } else {
+                // Default to good if no clear indicators
+                headline.classList.add('good');
+                headlineIcon.textContent = '✅';
+                headlineText.textContent = 'Good Summary';
+            }
+        }
+        
         // Get Meno Assist suggestions for form fields
         async function getMenoAssist(fieldType) {
             const button = event.target;
@@ -2010,6 +2109,7 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 aiAnalysisData = data;
                 
                 // Update UI with analysis
+                updateAnalysisHeadline(data.alignment || "✅ Your summary captures the key points well.");
                 document.getElementById('aiAnalysis').innerHTML = 
                     data.alignment || "✅ Your summary captures the key points well.";
                 
@@ -2070,8 +2170,9 @@ When you solve something interesting or learn something new, click the "💡 Cap
             const context = audienceContext[currentCapture.audience];
             const question = context.questions[Math.floor(Math.random() * context.questions.length)];
             
-            document.getElementById('aiAnalysis').innerHTML = 
-                "✅ Your summary captures the problem and solution clearly.";
+            const alignmentText = "✅ Your summary captures the problem and solution clearly.";
+            updateAnalysisHeadline(alignmentText);
+            document.getElementById('aiAnalysis').innerHTML = alignmentText;
             
             document.getElementById('socraticQuestion').textContent = 
                 `"${question}"`;
