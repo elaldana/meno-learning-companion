@@ -29,6 +29,7 @@ Create a simple tool that makes capturing and sharing AI-assisted problem soluti
 ## MVP Scope
 
 ### In Scope
+- **Proactive learning detection with intelligent suggestions**
 - Manual capture trigger (floating button)
 - **Enhanced 3-question form with AI assistance (Meno Assist)**
 - **AI-powered Socratic follow-up question with response guidance**
@@ -64,7 +65,10 @@ Create a simple tool that makes capturing and sharing AI-assisted problem soluti
 User works with Claude-powered application to solve a problem as they normally would, as if they were using Claude.ai.
 
 ### 2. Learning Capture Trigger
-- User clicks floating "💡 Capture Learning" button
+- **Proactive Detection**: Meno automatically detects learning opportunities and suggests capture
+- **Intelligent Timing**: Suggestions appear after problem-solving conversations, not during active problem-solving
+- **Social Motivation**: Suggestions include social context about how the learning could help others
+- **Manual Trigger**: User can also click floating "💡 Capture Learning" button
 - Application automatically analyzes the conversation context
 
 ### 3. Quick Capture Form
@@ -181,6 +185,29 @@ Example card:
 
 ## Enhanced Features
 
+### Proactive Learning Detection
+**Purpose**: Automatically identify and suggest learning capture opportunities
+**Features**:
+- **Intelligent Pattern Recognition**: Detects problem-solving, debugging, concept explanations, and best practices
+- **Social Context Generation**: Provides personalized reasons why the learning would benefit others
+- **Smart Timing**: Suggests capture after problem resolution, not during active problem-solving
+- **Confidence Scoring**: Uses multiple indicators to assess learning opportunity quality
+- **Rate Limiting**: Prevents suggestion spam with intelligent cooldown periods
+- **Non-Intrusive Design**: Suggestions appear as beautiful, dismissible cards in the chat flow
+
+**Learning Detection Patterns**:
+- **Problem Solved**: "solved", "fixed", "working now", "figured out"
+- **Debugging Success**: Error identification → resolution sequences
+- **Concept Explained**: "explain", "how does", "what is", "understand"
+- **Best Practice**: "best practice", "better way", "should use", "recommended"
+- **Troubleshooting**: Step-by-step problem resolution processes
+
+**Social Context Examples**:
+- "Your teammates might encounter this same issue"
+- "This solution could help others on your team"
+- "This debugging approach could save your team time"
+- "This explanation would be perfect for onboarding new team members"
+
 ### Meno Assist - AI-Powered Form Assistance
 **Purpose**: Help users write better problem, cause, and solution descriptions
 **Features**:
@@ -257,12 +284,18 @@ Example card:
 ## MVP Features
 
 ### P0 - Core Loop
-1. **Floating Capture Button**
+1. **Proactive Learning Detection**
+   - Automatically detects learning opportunities in conversations
+   - Suggests capture with social context and motivation
+   - Intelligent timing and rate limiting
+   - Beautiful, non-intrusive suggestion cards
+
+2. **Floating Capture Button**
    - Always visible on Claude.ai
    - Non-intrusive positioning
    - Clear call-to-action
 
-2. **Capture Modal**
+3. **Capture Modal**
    - Three text inputs
    - Auto-focus on first field
    - Escape to close
@@ -315,6 +348,7 @@ Example card:
 ### MVP Success Criteria
 - **Installation**: 10 team members install and try it
 - **Usage**: 5+ captures per user in first week
+- **Proactive Adoption**: 60%+ of users accept learning suggestions when offered
 - **Learning Enhancement**: 70%+ engage with Socratic questions
 - **Reflection**: 60%+ rate understanding as "Confident"
 - **Sharing**: 50% of captures get shared
@@ -329,11 +363,13 @@ Example card:
 
 ### Key Questions to Answer
 1. Do people actually click capture?
-2. What types of problems get captured?
-3. Where do people share (Slack vs Teams vs Wiki)?
-4. What's preventing more usage?
-5. Does the Socratic questioning actually deepen understanding?
-6. Are the AI-generated key learnings accurate and valuable?
+2. **Do proactive suggestions increase capture rates?**
+3. **What types of learning opportunities are most valuable?**
+4. What types of problems get captured?
+5. Where do people share (Slack vs Teams vs Wiki)?
+6. What's preventing more usage?
+7. Does the Socratic questioning actually deepen understanding?
+8. Are the AI-generated key learnings accurate and valuable?
 
 ## Future Enhancements
 
@@ -410,7 +446,7 @@ Example card:
 
 ## Overview
 
-The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 13 different types of prompts across AI interactions, user interfaces, fallback scenarios, and form assistance features.
+The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 14 different types of prompts across AI interactions, user interfaces, fallback scenarios, form assistance features, and proactive learning detection.
 
 ## AI System Prompts
 
@@ -682,6 +718,53 @@ Focus on helping them think about the social and educational aspects of their re
 - Enhances social learning by helping users think about audience needs
 - Encourages educational responses that help others learn
 - Balances technical accuracy with pedagogical effectiveness
+
+### 14. Proactive Learning Detection System
+**Purpose**: Automatically identifies learning opportunities and generates social context  
+**Location**: `index.html` (lines 1720-1850)  
+**Usage**: Real-time conversation analysis for learning opportunity detection
+
+```javascript
+// Learning opportunity patterns with confidence scoring
+const patterns = {
+    problemSolved: {
+        indicators: ['solved', 'fixed', 'working now', 'figured out', 'resolved'],
+        confidence: 0.8
+    },
+    debuggingSuccess: {
+        indicators: ['error', 'debug', 'troubleshoot', 'issue', 'problem'],
+        successIndicators: ['fixed', 'solved', 'working', 'resolved'],
+        confidence: 0.7
+    },
+    conceptExplained: {
+        indicators: ['explain', 'how does', 'what is', 'understand', 'learned'],
+        confidence: 0.6
+    },
+    bestPractice: {
+        indicators: ['best practice', 'better way', 'should use', 'recommended'],
+        confidence: 0.8
+    }
+};
+
+// Social context generation for different learning types
+const socialContexts = {
+    problemSolved: [
+        "Your teammates might encounter this same issue",
+        "This solution could help others on your team",
+        "This debugging approach could save your team time"
+    ],
+    debuggingSuccess: [
+        "This troubleshooting process would be valuable for your team",
+        "Other developers might run into this same error"
+    ]
+};
+```
+
+**Design Rationale**:
+- Uses pattern recognition to identify high-value learning moments
+- Generates socially-motivating context to encourage capture
+- Implements intelligent timing and rate limiting to avoid interruption
+- Balances automation with user control and choice
 
 ## Prompt Design Principles
 

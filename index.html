@@ -369,6 +369,86 @@
             color: white;
         }
         
+        /* Learning Suggestion */
+        .learning-suggestion {
+            margin: 20px 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 16px;
+            animation: slideInUp 0.4s ease-out;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+        
+        @keyframes slideInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .suggestion-content {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .suggestion-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .suggestion-text {
+            flex: 1;
+            line-height: 1.5;
+            color: #0c4a6e;
+        }
+        
+        .suggestion-text strong {
+            color: #0369a1;
+        }
+        
+        .suggestion-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .suggestion-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .suggestion-btn.primary {
+            background: #0ea5e9;
+            color: white;
+        }
+        
+        .suggestion-btn.primary:hover {
+            background: #0284c7;
+            transform: translateY(-1px);
+        }
+        
+        .suggestion-btn.secondary {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .suggestion-btn.secondary:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
         /* Input Area */
         .input-container {
             background: white;
@@ -1712,6 +1792,11 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 addMessage(data.response, 'assistant');
                 conversationHistory.push({ role: 'assistant', content: data.response });
                 
+                // Check for learning opportunities after AI response
+                setTimeout(() => {
+                    checkForLearningOpportunity();
+                }, 1000); // Wait 1 second after response to check
+                
             } catch (error) {
                 console.error('Error:', error);
                 // More specific error messages
@@ -1728,6 +1813,202 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 document.getElementById('sendButton').disabled = false;
                 document.getElementById('sendButton').innerHTML = 'Send';
                 input.focus();
+            }
+        }
+        
+        // Proactive learning detection system
+        function checkForLearningOpportunity() {
+            // Don't suggest if we've already suggested recently or if user is in capture flow
+            if (hasSuggestedRecently() || isInCaptureFlow()) {
+                return;
+            }
+            
+            const learningOpportunity = detectLearningOpportunity();
+            if (learningOpportunity) {
+                showLearningSuggestion(learningOpportunity);
+            }
+        }
+        
+        // Check if we've suggested learning capture recently
+        function hasSuggestedRecently() {
+            const lastSuggestion = localStorage.getItem('lastLearningSuggestion');
+            if (!lastSuggestion) return false;
+            
+            const timeSinceLastSuggestion = Date.now() - parseInt(lastSuggestion);
+            const minInterval = 5 * 60 * 1000; // 5 minutes minimum between suggestions
+            
+            return timeSinceLastSuggestion < minInterval;
+        }
+        
+        // Check if user is currently in capture flow
+        function isInCaptureFlow() {
+            return document.getElementById('modalContainer').classList.contains('show');
+        }
+        
+        // Detect learning opportunities in conversation
+        function detectLearningOpportunity() {
+            if (conversationHistory.length < 4) return null;
+            
+            const recentMessages = conversationHistory.slice(-6); // Last 6 messages
+            const fullConversation = recentMessages.map(msg => msg.content).join(' ').toLowerCase();
+            
+            // Learning opportunity patterns
+            const patterns = {
+                problemSolved: {
+                    indicators: ['solved', 'fixed', 'working now', 'figured out', 'resolved', 'got it working'],
+                    confidence: 0.8
+                },
+                debuggingSuccess: {
+                    indicators: ['error', 'debug', 'troubleshoot', 'issue', 'problem'],
+                    successIndicators: ['fixed', 'solved', 'working', 'resolved'],
+                    confidence: 0.7
+                },
+                conceptExplained: {
+                    indicators: ['explain', 'how does', 'what is', 'understand', 'learned'],
+                    confidence: 0.6
+                },
+                bestPractice: {
+                    indicators: ['best practice', 'better way', 'should use', 'recommended', 'proper way'],
+                    confidence: 0.8
+                },
+                troubleshooting: {
+                    indicators: ['step by step', 'check', 'verify', 'test', 'try'],
+                    successIndicators: ['worked', 'successful', 'correct'],
+                    confidence: 0.7
+                }
+            };
+            
+            let bestMatch = null;
+            let highestConfidence = 0;
+            
+            for (const [type, pattern] of Object.entries(patterns)) {
+                const hasIndicators = pattern.indicators.some(indicator => 
+                    fullConversation.includes(indicator)
+                );
+                
+                if (hasIndicators) {
+                    let confidence = pattern.confidence;
+                    
+                    // Boost confidence if there are success indicators
+                    if (pattern.successIndicators) {
+                        const hasSuccess = pattern.successIndicators.some(indicator => 
+                            fullConversation.includes(indicator)
+                        );
+                        if (hasSuccess) confidence += 0.2;
+                    }
+                    
+                    // Boost confidence for longer conversations (more complex problems)
+                    if (conversationHistory.length > 8) confidence += 0.1;
+                    
+                    if (confidence > highestConfidence) {
+                        highestConfidence = confidence;
+                        bestMatch = { type, confidence, pattern };
+                    }
+                }
+            }
+            
+            // Only suggest if confidence is high enough
+            if (highestConfidence >= 0.6) {
+                return {
+                    type: bestMatch.type,
+                    confidence: bestMatch.confidence,
+                    socialContext: generateSocialContext(bestMatch.type, fullConversation)
+                };
+            }
+            
+            return null;
+        }
+        
+        // Generate social context for learning suggestion
+        function generateSocialContext(learningType, conversation) {
+            const contexts = {
+                problemSolved: [
+                    "Your teammates might encounter this same issue",
+                    "This solution could help others on your team",
+                    "This debugging approach could save your team time"
+                ],
+                debuggingSuccess: [
+                    "This troubleshooting process would be valuable for your team",
+                    "Other developers might run into this same error",
+                    "This debugging technique could help the entire engineering team"
+                ],
+                conceptExplained: [
+                    "This explanation would be perfect for onboarding new team members",
+                    "Your team could benefit from this clear explanation",
+                    "This concept breakdown could help other developers"
+                ],
+                bestPractice: [
+                    "This best practice should be shared with your team",
+                    "Your teammates could learn from this approach",
+                    "This pattern could improve your team's code quality"
+                ],
+                troubleshooting: [
+                    "This troubleshooting process could help others",
+                    "Your team might need this step-by-step guide",
+                    "This debugging approach could save others hours"
+                ]
+            };
+            
+            const typeContexts = contexts[learningType] || contexts.problemSolved;
+            return typeContexts[Math.floor(Math.random() * typeContexts.length)];
+        }
+        
+        // Show learning capture suggestion
+        function showLearningSuggestion(opportunity) {
+            // Store suggestion timestamp
+            localStorage.setItem('lastLearningSuggestion', Date.now().toString());
+            
+            // Create suggestion element
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.className = 'learning-suggestion';
+            suggestionDiv.innerHTML = `
+                <div class="suggestion-content">
+                    <div class="suggestion-icon">💡</div>
+                    <div class="suggestion-text">
+                        <strong>It looks like this could be a good opportunity to capture a learning!</strong><br>
+                        ${opportunity.socialContext}
+                    </div>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="suggestion-btn primary" onclick="acceptLearningSuggestion()">
+                        💡 Capture Learning
+                    </button>
+                    <button class="suggestion-btn secondary" onclick="dismissLearningSuggestion()">
+                        Maybe later
+                    </button>
+                </div>
+            `;
+            
+            // Add to chat container
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.appendChild(suggestionDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Auto-dismiss after 30 seconds
+            setTimeout(() => {
+                if (suggestionDiv.parentNode) {
+                    suggestionDiv.remove();
+                }
+            }, 30000);
+        }
+        
+        // Accept learning suggestion
+        function acceptLearningSuggestion() {
+            // Remove suggestion
+            const suggestion = document.querySelector('.learning-suggestion');
+            if (suggestion) {
+                suggestion.remove();
+            }
+            
+            // Start capture flow
+            startCapture();
+        }
+        
+        // Dismiss learning suggestion
+        function dismissLearningSuggestion() {
+            const suggestion = document.querySelector('.learning-suggestion');
+            if (suggestion) {
+                suggestion.remove();
             }
         }
         
