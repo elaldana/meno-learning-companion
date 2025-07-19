@@ -69,6 +69,7 @@ User works with Claude-powered application to solve a problem as they normally w
 
 ### 3. Quick Capture Form
 Simple modal appears with audience selection:
+
 ```
 "I'll help track this problem and solution. Who might face this same problem?"
 
@@ -80,6 +81,7 @@ Simple modal appears with audience selection:
 ```
 
 Modal then presents three questions with AI assistance:
+
 ```
 What was the problem?
 [Text input with 🤖 Meno Assist button]
@@ -413,8 +415,8 @@ The Meno Learning Companion uses a sophisticated prompt architecture to create e
 ## AI System Prompts
 
 ### 1. Main Chat System Prompt
-**Purpose**: Defines Meno's personality and conversational approach
-**Location**: `api/chat.js` (lines 102-108)
+**Purpose**: Defines Meno's personality and conversational approach  
+**Location**: `api/chat.js` (lines 102-108)  
 **Usage**: All chat interactions with users
 
 ```javascript
@@ -432,8 +434,8 @@ Use the Socratic method when appropriate to deepen understanding.`
 - Maintains a supportive, educational tone
 
 ### 2. Analysis Prompt
-**Purpose**: Generates learning enhancements and audience-specific questions
-**Location**: `api/chat.js` (lines 148-175)
+**Purpose**: Generates learning enhancements and audience-specific questions  
+**Location**: `api/chat.js` (lines 148-175)  
 **Usage**: When users capture learning insights
 
 ```javascript
@@ -475,8 +477,8 @@ Format your response as JSON with these fields:
 ## User Interface Prompts
 
 ### 3. Chat Input Placeholder
-**Purpose**: Guides users to start conversations
-**Location**: `index.html` (line 776)
+**Purpose**: Guides users to start conversations  
+**Location**: `index.html` (line 776)  
 **Usage**: Main chat interface
 
 ```html
@@ -486,8 +488,8 @@ placeholder="Ask me anything..."
 **Design Rationale**: Simple, open-ended invitation that doesn't constrain user thinking
 
 ### 4. Socratic Response Placeholder
-**Purpose**: Encourages users to respond to AI-generated questions
-**Location**: `index.html` (line 851)
+**Purpose**: Encourages users to respond to AI-generated questions  
+**Location**: `index.html` (line 851)  
 **Usage**: Learning capture workflow
 
 ```html
@@ -500,8 +502,8 @@ placeholder="How would you respond to this question? (optional)..."
 - Encourages deeper thinking about the question
 
 ### 5. Key Learning Revision Placeholder
-**Purpose**: Allows users to refine AI-generated insights
-**Location**: `index.html` (line 883)
+**Purpose**: Allows users to refine AI-generated insights  
+**Location**: `index.html` (line 883)  
 **Usage**: Learning validation step
 
 ```html
@@ -513,8 +515,8 @@ placeholder="Write your own key learning..." rows="2"
 ## Fallback Local Prompts
 
 ### 6. Team Questions (Fallback)
-**Purpose**: Provides realistic team-focused questions when AI is unavailable
-**Location**: `index.html` (lines 1335-1340)
+**Purpose**: Provides realistic team-focused questions when AI is unavailable  
+**Location**: `index.html` (lines 1335-1340)  
 **Usage**: Offline or AI failure scenarios
 
 ```javascript
@@ -532,8 +534,8 @@ questions: [
 - Uses casual, conversational language
 
 ### 7. Future Self Questions (Fallback)
-**Purpose**: Provides introspective questions for future reference
-**Location**: `index.html` (lines 1341-1346)
+**Purpose**: Provides introspective questions for future reference  
+**Location**: `index.html` (lines 1341-1346)  
 **Usage**: Offline or AI failure scenarios
 
 ```javascript
@@ -551,8 +553,8 @@ questions: [
 - Prepares for future problem-solving scenarios
 
 ### 8. New Hire Questions (Fallback)
-**Purpose**: Provides onboarding-focused questions for knowledge transfer
-**Location**: `index.html` (lines 1347-1352)
+**Purpose**: Provides onboarding-focused questions for knowledge transfer  
+**Location**: `index.html` (lines 1347-1352)  
 **Usage**: Offline or AI failure scenarios
 
 ```javascript
@@ -572,8 +574,8 @@ questions: [
 ## Meno Assist Prompts
 
 ### 9. Problem Identification Assist Prompt
-**Purpose**: Helps users articulate the core problem they solved
-**Location**: `index.html` (lines 1820-1830)
+**Purpose**: Helps users articulate the core problem they solved  
+**Location**: `index.html` (lines 1820-1830)  
 **Usage**: When users click "Meno Assist" for problem field
 
 ```javascript
@@ -593,8 +595,8 @@ Focus on helping them articulate their own understanding, not giving them the an
 - Emphasizes clarity and specificity in problem articulation
 
 ### 10. Root Cause Analysis Assist Prompt
-**Purpose**: Helps users identify underlying causes of problems
-**Location**: `index.html` (lines 1831-1841)
+**Purpose**: Helps users identify underlying causes of problems  
+**Location**: `index.html` (lines 1831-1841)  
 **Usage**: When users click "Meno Assist" for cause field
 
 ```javascript
@@ -614,8 +616,8 @@ Help them think deeper about causality, not just surface-level issues.`
 - Provides frameworks for systematic analysis
 
 ### 11. Solution Documentation Assist Prompt
-**Purpose**: Helps users document their solution effectively
-**Location**: `index.html` (lines 1842-1852)
+**Purpose**: Helps users document their solution effectively  
+**Location**: `index.html` (lines 1842-1852)  
 **Usage**: When users click "Meno Assist" for solution field
 
 ```javascript
@@ -635,8 +637,8 @@ Focus on helping them capture the key steps and reasoning, not just the final an
 - Helps users create templates for future problem-solving
 
 ### 12. Meno Assist API Prompt
-**Purpose**: Structures AI responses for form field assistance
-**Location**: `api/chat.js` (lines 280-290)
+**Purpose**: Structures AI responses for form field assistance  
+**Location**: `api/chat.js` (lines 280-290)  
 **Usage**: Backend processing of Meno Assist requests
 
 ```javascript
@@ -661,8 +663,8 @@ Focus on helping them think through their own understanding, not providing the a
 - Provides conversation context for relevant suggestions
 
 ### 13. Socratic Response Assist Prompt
-**Purpose**: Helps users think through how to respond to audience questions
-**Location**: `index.html` (lines 1842-1852)
+**Purpose**: Helps users think through how to respond to audience questions  
+**Location**: `index.html` (lines 1842-1852)  
 **Usage**: When users click "Meno Assist" for Socratic response field
 
 ```javascript
