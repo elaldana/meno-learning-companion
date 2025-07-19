@@ -845,11 +845,11 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 </div>
                 
                 <div class="ai-section">
-                    <h4>🤔 Deeper Understanding</h4>
+                    <h4>🤔 What would <span id="audienceQuestion">your audience</span> ask?</h4>
                     <div class="socratic-question" id="socraticQuestion">
                         Generating contextual question...
                     </div>
-                    <textarea class="socratic-response" id="socraticResponse" placeholder="Your thoughts (optional)..." rows="3"></textarea>
+                    <textarea class="socratic-response" id="socraticResponse" placeholder="How would you respond to this question? (optional)..." rows="3"></textarea>
                 </div>
                 
                 <div class="ai-section">
@@ -1237,6 +1237,17 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 btn.classList.remove('selected');
             });
             event.target.classList.add('selected');
+            
+            // Update the audience question text
+            const audienceQuestionElement = document.getElementById('audienceQuestion');
+            if (audienceQuestionElement) {
+                const audienceText = {
+                    'team': 'your teammate',
+                    'future': 'you later',
+                    'new': 'a new hire'
+                }[audience] || 'your audience';
+                audienceQuestionElement.textContent = audienceText;
+            }
         }
         
         // Handle form submission
@@ -1334,27 +1345,30 @@ When you solve something interesting or learn something new, click the "💡 Cap
         function performLocalAnalysis() {
             const audienceContext = {
                 'team': {
-                    context: "your team might ask",
+                    context: "a teammate might ask you",
                     questions: [
-                        "How can we prevent this from happening again?",
-                        "What's the impact on our other systems?",
-                        "Should we add monitoring for this?"
+                        "Wait, why did this break in the first place? What was the root cause?",
+                        "How do we make sure this doesn't happen again? Should we add some tests?",
+                        "What if this happens in production? Do we have monitoring for this?",
+                        "Could this affect other parts of the system? Should we check?"
                     ]
                 },
                 'future': {
-                    context: "you might ask yourself later",
+                    context: "you might wonder later",
                     questions: [
-                        "What were the exact steps to reproduce this?",
-                        "What tools did I use to diagnose this?",
-                        "Are there edge cases I should remember?"
+                        "What was I thinking when I wrote this? Why did I choose this approach?",
+                        "How did I figure out this was the problem? What debugging steps did I take?",
+                        "What if this breaks again? Do I remember all the steps to fix it?",
+                        "Is there a better way to solve this now that I understand it better?"
                     ]
                 },
                 'new': {
-                    context: "someone new might ask",
+                    context: "a new team member might ask",
                     questions: [
-                        "What background knowledge is needed here?",
-                        "Where can I learn more about this?",
-                        "How common is this type of issue?"
+                        "I'm seeing this same error - what should I check first?",
+                        "What background do I need to understand this problem?",
+                        "Where can I find more info about this? Are there docs?",
+                        "How often does this happen? Is this a common issue?"
                     ]
                 }
             };
@@ -1366,7 +1380,7 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 "✅ Your summary captures the problem and solution clearly.";
             
             document.getElementById('socraticQuestion').textContent = 
-                `Good work! Here's something ${context.context}: "${question}"`;
+                `"${question}"`;
             
             document.getElementById('keyLearning').textContent = 
                 "Document your learnings to help yourself and others solve problems faster.";

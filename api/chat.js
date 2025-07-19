@@ -159,14 +159,17 @@ User's capture:
 
 Please provide:
 1. An assessment of how well their summary captures the essence of the conversation
-2. A Socratic question specific to their audience (${captureData.audience === 'team' ? 'their team' : captureData.audience === 'future' ? 'their future self' : 'new hires'})
+2. A realistic question that their actual audience would ask them about this problem/solution. Make it specific and practical:
+   - For "team": What would a teammate actually ask in a code review, standup, or when they encounter this same issue?
+   - For "future": What would you actually wonder when you see this solution 6 months from now?
+   - For "new hires": What would a new team member actually ask when they're trying to understand this?
 3. The key learning principle from this experience
 4. Any suggestions if they missed important aspects
 
 Format your response as JSON with these fields:
 {
   "alignment": "assessment of their summary",
-  "socraticQuestion": "a thoughtful question for deeper understanding",
+  "socraticQuestion": "a realistic question their audience would actually ask them",
   "keyLearning": "the main principle or insight",
   "suggestions": "any recommendations or missing elements"
 }`;
