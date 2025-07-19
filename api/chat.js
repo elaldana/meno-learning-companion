@@ -15,13 +15,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   
+  // Debug: Check if API key is present
+  if (!process.env.CLAUDE_API_KEY) {
+    console.error('CLAUDE_API_KEY is not set in environment variables');
+    return res.status(500).json({ 
+      error: 'Server configuration error: API key not found. Please set CLAUDE_API_KEY in Vercel environment variables.' 
+    });
+  }
+  
+  // Log that we have an API key (but not the key itself)
+  console.log('API Key present:', process.env.CLAUDE_API_KEY ? 'Yes' : 'No');
+  console.log('API Key length:', process.env.CLAUDE_API_KEY?.length);
+  
   const { action, message, conversationHistory, captureData } = req.body;
   
   // Available models:
   // - claude-3-haiku-20240307: Fast, efficient for quick tasks
   // - claude-3-5-sonnet-20241022: Balanced performance and capability
   // - claude-3-opus-20240229: Most capable Claude 3 model
-  // - claude-opus-4-20250514: Latest and most powerful Claude 4 model
   
   try {
     // Different actions based on request type
@@ -50,6 +61,12 @@ async function handleChat(req, res, message, conversationHistory) {
   
   // Get model from request or use default
   const model = req.body.model || 'claude-3-5-sonnet-20241022';
+  
+  console.log('Chat request:', { 
+    messageLength: message.length, 
+    historyLength: conversationHistory?.length || 0,
+    model: model 
+  });
   
   try {
     // Build messages array with conversation history
@@ -81,6 +98,7 @@ async function handleChat(req, res, message, conversationHistory) {
     });
     
     // Call Claude API
+    console.log('Calling Claude API with model:', model);
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -95,11 +113,21 @@ async function handleChat(req, res, message, conversationHistory) {
       })
     });
     
+    console.log('Claude API response status:', response.status);
+    
     const data = await response.json();
     
     if (!response.ok) {
       console.error('Claude API error:', data);
-      return res.status(500).json({ error: 'Failed to get AI response' });
+      // More detailed error information
+      if (data.error?.type === 'authentication_error') {
+        return res.status(500).json({ error: 'API authentication failed. Please check your CLAUDE_API_KEY.' });
+      } else if (data.error?.type === 'invalid_request_error') {
+        return res.status(500).json({ error: 'Invalid request to Claude API: ' + (data.error?.message || 'Unknown error') });
+      } else if (data.error?.type === 'rate_limit_error') {
+        return res.status(500).json({ error: 'Rate limit exceeded. Please try again later.' });
+      }
+      return res.status(500).json({ error: 'Claude API error: ' + (data.error?.message || JSON.stringify(data)) });
     }
     
     return res.status(200).json({ 
@@ -170,14 +198,28 @@ Format your response as JSON with these fields:
     
     if (!response.ok) {
       console.error('Claude API error:', data);
-      return res.status(500).json({ error: 'Failed to analyze capture' });
+      // More detailed error information for analyze endpoint
+      if (data.error?.type === 'authentication_error') {
+        return res.status(500).json({ error: 'API authentication failed. Please check your CLAUDE_API_KEY.' });
+      } else if (data.error?.type === 'invalid_request_error') {
+        return res.status(500).json({ error: 'Invalid request to Claude API: ' + (data.error?.message || 'Unknown error') });
+      } else if (data.error?.type === 'rate_limit_error') {
+        return res.status(500).json({ error: 'Rate limit exceeded. Please try again later.' });
+      }
+      return res.status(500).json({ error: 'Claude API error: ' + (data.error?.message || JSON.stringify(data)) });
     }
     
     // Parse the JSON response
     try {
-      const analysis = JSON.parse(data.content[0].text);
-      return res.status(200).json(analysis);
+      if (data.content && data.content[0] && data.content[0].text) {
+        const analysis = JSON.parse(data.content[0].text);
+        return res.status(200).json(analysis);
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      console.error('Raw response:', data);
       // If JSON parsing fails, return structured response
       return res.status(200).json({
         alignment: "Your summary captures the key points well.",
