@@ -123,10 +123,69 @@
             margin-bottom: 24px;
         }
         
+        .filter-summary {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-summary .active-filter {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        
         .library-filters {
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 16px;
             margin-bottom: 20px;
+        }
+        
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-section h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        
+        .clear-filters-btn {
+            padding: 6px 12px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        
+        .clear-filters-btn:hover {
+            background: #e0e0e0;
+            color: #333;
         }
         
         .filter-button {
@@ -873,13 +932,32 @@ When you solve something interesting or learn something new, click the "💡 Cap
         <div class="library-header">
             <h2>Your Insight Library</h2>
             <p>All your captured learnings in one place</p>
+            <div class="filter-summary" id="filterSummary"></div>
         </div>
         
         <div class="library-filters">
-            <button class="filter-button active" onclick="filterInsights('all')">All</button>
-            <button class="filter-button" onclick="filterInsights('team')">👥 Team</button>
-            <button class="filter-button" onclick="filterInsights('future')">🔮 Future Me</button>
-            <button class="filter-button" onclick="filterInsights('new')">🆕 New Hires</button>
+            <div class="filter-section">
+                <h4>Audience</h4>
+                <div class="filter-buttons">
+                    <button class="filter-button active" data-audience="all" onclick="setAudienceFilter('all')">All</button>
+                    <button class="filter-button" data-audience="team" onclick="setAudienceFilter('team')">👥 Team</button>
+                    <button class="filter-button" data-audience="future" onclick="setAudienceFilter('future')">🔮 Future Me</button>
+                    <button class="filter-button" data-audience="new" onclick="setAudienceFilter('new')">🆕 New Hires</button>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h4>Understanding Level</h4>
+                <div class="filter-buttons">
+                    <button class="filter-button" data-confidence="all" onclick="setConfidenceFilter('all')">All</button>
+                    <button class="filter-button" data-confidence="low" onclick="setConfidenceFilter('low')">😕 Still Learning</button>
+                    <button class="filter-button" data-confidence="medium" onclick="setConfidenceFilter('medium')">🤔 Somewhat Confident</button>
+                    <button class="filter-button" data-confidence="high" onclick="setConfidenceFilter('high')">😊 Very Confident</button>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="clear-filters-btn" onclick="clearAllFilters()">Clear All Filters</button>
+            </div>
+        </div>
         </div>
         
         <div class="insight-grid" id="insightGrid">
@@ -1111,23 +1189,37 @@ When you solve something interesting or learn something new, click the "💡 Cap
         // Load insights from localStorage
         function loadInsights() {
             const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
-            displayInsights(insights);
+            displayInsights(insights, currentAudienceFilter, currentConfidenceFilter);
         }
         
         // Display insights in grid
-        function displayInsights(insights, filter = 'all') {
+        function displayInsights(insights, audienceFilter = 'all', confidenceFilter = 'all') {
             const grid = document.getElementById('insightGrid');
             
-            // Filter insights
-            const filteredInsights = filter === 'all' 
-                ? insights 
-                : insights.filter(i => i.audience === filter);
+            // Filter insights by both audience and confidence
+            let filteredInsights = insights;
+            
+            if (audienceFilter !== 'all') {
+                filteredInsights = filteredInsights.filter(i => i.audience === audienceFilter);
+            }
+            
+            if (confidenceFilter !== 'all') {
+                filteredInsights = filteredInsights.filter(i => i.confidence === confidenceFilter);
+            }
             
             if (filteredInsights.length === 0) {
+                let message = 'Start a conversation and capture your first learning!';
+                if (audienceFilter !== 'all' || confidenceFilter !== 'all') {
+                    const filters = [];
+                    if (audienceFilter !== 'all') filters.push(getAudienceLabel(audienceFilter));
+                    if (confidenceFilter !== 'all') filters.push(getConfidenceText(confidenceFilter));
+                    message = `No insights found for: ${filters.join(' • ')}`;
+                }
+                
                 grid.innerHTML = `
                     <div class="empty-state">
                         <h3>No insights found</h3>
-                        <p>${filter === 'all' ? 'Start a conversation and capture your first learning!' : 'No insights for this audience yet.'}</p>
+                        <p>${message}</p>
                     </div>
                 `;
                 return;
@@ -1156,14 +1248,78 @@ When you solve something interesting or learn something new, click the "💡 Cap
             `).join('');
         }
         
-        // Filter insights by audience
-        function filterInsights(filter) {
-            const buttons = document.querySelectorAll('.filter-button');
-            buttons.forEach(btn => btn.classList.remove('active'));
+        // Store current filter state
+        let currentAudienceFilter = 'all';
+        let currentConfidenceFilter = 'all';
+        
+        // Set audience filter
+        function setAudienceFilter(audience) {
+            currentAudienceFilter = audience;
+            
+            // Update active states for audience buttons
+            document.querySelectorAll('[data-audience]').forEach(btn => {
+                btn.classList.remove('active');
+            });
             event.target.classList.add('active');
             
+            applyFilters();
+        }
+        
+        // Set confidence filter
+        function setConfidenceFilter(confidence) {
+            currentConfidenceFilter = confidence;
+            
+            // Update active states for confidence buttons
+            document.querySelectorAll('[data-confidence]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            applyFilters();
+        }
+        
+        // Apply current filters
+        function applyFilters() {
             const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
-            displayInsights(insights, filter);
+            displayInsights(insights, currentAudienceFilter, currentConfidenceFilter);
+            updateFilterSummary();
+        }
+        
+        // Update filter summary display
+        function updateFilterSummary() {
+            const summary = document.getElementById('filterSummary');
+            const filters = [];
+            
+            if (currentAudienceFilter !== 'all') {
+                filters.push(`<span class="active-filter">${getAudienceLabel(currentAudienceFilter)}</span>`);
+            }
+            
+            if (currentConfidenceFilter !== 'all') {
+                filters.push(`<span class="active-filter">${getConfidenceText(currentConfidenceFilter)}</span>`);
+            }
+            
+            if (filters.length > 0) {
+                summary.innerHTML = `Active filters: ${filters.join(' • ')}`;
+            } else {
+                summary.innerHTML = '';
+            }
+        }
+        
+        // Clear all filters
+        function clearAllFilters() {
+            currentAudienceFilter = 'all';
+            currentConfidenceFilter = 'all';
+            
+            // Reset all filter buttons
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Set "All" buttons as active
+            document.querySelector('[data-audience="all"]').classList.add('active');
+            document.querySelector('[data-confidence="all"]').classList.add('active');
+            
+            applyFilters();
         }
         
         // Copy insight to clipboard
