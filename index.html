@@ -1699,27 +1699,12 @@ When you solve something interesting or learn something new, click the "💡 Cap
             prefillCapture();
         }
         
-        // Prefill capture form based on conversation
+        // Initialize capture form (no auto-population)
         function prefillCapture() {
-            // Try to extract problem from recent conversation
-            const recentMessages = conversationHistory.slice(-6);
-            const userMessages = recentMessages.filter(m => m.role === 'user');
-            
-            if (userMessages.length > 0) {
-                // Use the most relevant user message as a starting point
-                const lastUserMessage = userMessages[userMessages.length - 1].content;
-                
-                // Smart extraction based on keywords
-                if (lastUserMessage.length < 100) {
-                    document.getElementById('problemInput').value = lastUserMessage;
-                } else {
-                    // Extract first sentence or question
-                    const firstSentence = lastUserMessage.match(/^[^.!?]+[.!?]/);
-                    if (firstSentence) {
-                        document.getElementById('problemInput').value = firstSentence[0].trim();
-                    }
-                }
-            }
+            // Clear any existing values to start fresh
+            document.getElementById('problemInput').value = '';
+            document.getElementById('causeInput').value = '';
+            document.getElementById('solutionInput').value = '';
         }
         
         // Get Meno Assist suggestions for form fields
