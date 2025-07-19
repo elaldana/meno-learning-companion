@@ -158,11 +158,59 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: all 0.2s;
+            border-left: 4px solid #6366f1;
         }
         
         .insight-card-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .insight-header h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+            flex: 1;
+            margin-right: 12px;
+        }
+        
+        .insight-badge {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .insight-content {
+            margin-bottom: 12px;
+        }
+        
+        .insight-content p {
+            margin: 8px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .insight-cause {
+            color: #666;
+        }
+        
+        .insight-solution {
+            color: #333;
+        }
+        
+        .insight-learning {
+            color: #6366f1;
+            font-weight: 500;
         }
         
         .insight-card-meta {
@@ -172,6 +220,19 @@
             margin-top: 12px;
             font-size: 12px;
             color: #666;
+        }
+        
+        .confidence-badge {
+            background: #f0f9ff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #0369a1;
+        }
+        
+        .date-badge {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 12px;
         }
         
         .insight-actions {
@@ -347,6 +408,68 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .insight-detail-modal {
+            max-width: 700px;
+            max-height: 80vh;
+        }
+        
+        .modal-content {
+            padding: 24px;
+        }
+        
+        .insight-detail-section {
+            margin-bottom: 24px;
+        }
+        
+        .insight-detail-section h4 {
+            margin: 0 0 12px 0;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .insight-detail-content {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+        }
+        
+        .conversation-history {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .conversation-message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .conversation-message.user {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .conversation-message.assistant {
+            background: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+        }
+        
+        .conversation-message .role {
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            opacity: 0.7;
         }
         
         .modal-header {
@@ -899,6 +1022,19 @@ When you solve something interesting or learn something new, click the "💡 Cap
         </div>
     </div>
     
+    <!-- Insight Detail Modal -->
+    <div class="modal-container" id="insightDetailModal">
+        <div class="modal insight-detail-modal">
+            <div class="modal-header">
+                <h3>💡 Learning Insight Details</h3>
+                <button class="close-btn" onclick="closeInsightDetail()">×</button>
+            </div>
+            <div class="modal-content" id="insightDetailContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
     
@@ -998,15 +1134,21 @@ When you solve something interesting or learn something new, click the "💡 Cap
             }
             
             grid.innerHTML = filteredInsights.map((insight, index) => `
-                <div class="insight-card-item" data-index="${index}">
-                    <h4>${insight.problem}</h4>
-                    <p><strong>Solution:</strong> ${insight.solution}</p>
-                    <p><strong>Key Learning:</strong> ${insight.keyLearning}</p>
-                    <div class="insight-card-meta">
-                        <span>${getAudienceLabel(insight.audience)} • ${getConfidenceLabel(insight.confidence)}</span>
-                        <span>${new Date(insight.timestamp).toLocaleDateString()}</span>
+                <div class="insight-card-item" data-index="${index}" onclick="viewInsightDetail(${index})">
+                    <div class="insight-header">
+                        <h4>${insight.problem}</h4>
+                        <span class="insight-badge">${getAudienceLabel(insight.audience)}</span>
                     </div>
-                    <div class="insight-actions">
+                    <div class="insight-content">
+                        <p class="insight-cause"><strong>Cause:</strong> ${insight.cause}</p>
+                        <p class="insight-solution"><strong>Solution:</strong> ${insight.solution}</p>
+                        <p class="insight-learning"><strong>Key Learning:</strong> ${insight.keyLearning}</p>
+                    </div>
+                    <div class="insight-card-meta">
+                        <span class="confidence-badge">${getConfidenceLabel(insight.confidence)} ${getConfidenceText(insight.confidence)}</span>
+                        <span class="date-badge">${new Date(insight.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <div class="insight-actions" onclick="event.stopPropagation()">
                         <button class="action-button" onclick="copyInsight(${index})">📋 Copy</button>
                         <button class="action-button" onclick="deleteInsight(${index})">🗑️ Delete</button>
                     </div>
@@ -1046,6 +1188,89 @@ When you solve something interesting or learn something new, click the "💡 Cap
             }
         }
         
+        // View insight detail
+        function viewInsightDetail(index) {
+            const insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
+            const insight = insights[index];
+            
+            if (!insight) return;
+            
+            const content = document.getElementById('insightDetailContent');
+            
+            content.innerHTML = `
+                <div class="insight-detail-section">
+                    <h4>🎯 Problem</h4>
+                    <div class="insight-detail-content">${insight.problem}</div>
+                </div>
+                
+                <div class="insight-detail-section">
+                    <h4>🔍 Cause</h4>
+                    <div class="insight-detail-content">${insight.cause}</div>
+                </div>
+                
+                <div class="insight-detail-section">
+                    <h4>💡 Solution</h4>
+                    <div class="insight-detail-content">${insight.solution}</div>
+                </div>
+                
+                <div class="insight-detail-section">
+                    <h4>🧠 Key Learning</h4>
+                    <div class="insight-detail-content">${insight.keyLearning}</div>
+                </div>
+                
+                ${insight.socraticQuestion ? `
+                <div class="insight-detail-section">
+                    <h4>🤔 Socratic Question</h4>
+                    <div class="insight-detail-content">"${insight.socraticQuestion}"</div>
+                </div>
+                ` : ''}
+                
+                ${insight.socraticResponse ? `
+                <div class="insight-detail-section">
+                    <h4>💭 Your Response</h4>
+                    <div class="insight-detail-content">"${insight.socraticResponse}"</div>
+                </div>
+                ` : ''}
+                
+                <div class="insight-detail-section">
+                    <h4>📊 Metadata</h4>
+                    <div class="insight-detail-content">
+                        <p><strong>Audience:</strong> ${getAudienceLabel(insight.audience)}</p>
+                        <p><strong>Confidence:</strong> ${getConfidenceLabel(insight.confidence)} ${getConfidenceText(insight.confidence)}</p>
+                        <p><strong>Date:</strong> ${new Date(insight.timestamp).toLocaleString()}</p>
+                    </div>
+                </div>
+                
+                ${insight.conversationHistory && insight.conversationHistory.length > 0 ? `
+                <div class="insight-detail-section">
+                    <h4>💬 Conversation History</h4>
+                    <div class="conversation-history">
+                        ${insight.conversationHistory.map(msg => `
+                            <div class="conversation-message ${msg.role}">
+                                <div class="role">${msg.role === 'user' ? 'You' : 'Meno'}</div>
+                                <div>${msg.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="insight-detail-section">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="copyInsight(${index})">📋 Copy to Clipboard</button>
+                        <button class="btn btn-secondary" onclick="closeInsightDetail()">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('insightDetailModal').classList.add('show');
+        }
+        
+        // Close insight detail
+        function closeInsightDetail() {
+            document.getElementById('insightDetailModal').classList.remove('show');
+        }
+        
         // Get audience label
         function getAudienceLabel(audience) {
             const labels = {
@@ -1062,6 +1287,16 @@ When you solve something interesting or learn something new, click the "💡 Cap
                 'low': '😕',
                 'medium': '🤔',
                 'high': '😊'
+            };
+            return labels[confidence] || '';
+        }
+        
+        // Get confidence text
+        function getConfidenceText(confidence) {
+            const labels = {
+                'low': 'Still learning',
+                'medium': 'Somewhat confident',
+                'high': 'Very confident'
             };
             return labels[confidence] || '';
         }
@@ -1449,6 +1684,9 @@ ${socraticResponse}`;
         
         // Save and close
         function saveAndClose() {
+            // Add conversation history to the capture
+            currentCapture.conversationHistory = conversationHistory.slice(-10); // Last 10 messages
+            
             // Save to localStorage
             let insights = JSON.parse(localStorage.getItem('menoInsights') || '[]');
             insights.unshift(currentCapture); // Add to beginning
@@ -1510,6 +1748,13 @@ ${socraticResponse}`;
         document.getElementById('modalContainer').addEventListener('click', (e) => {
             if (e.target === document.getElementById('modalContainer')) {
                 closeModal();
+            }
+        });
+        
+        // Close insight detail modal on backdrop click
+        document.getElementById('insightDetailModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('insightDetailModal')) {
+                closeInsightDetail();
             }
         });
         

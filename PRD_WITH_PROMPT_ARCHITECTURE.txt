@@ -1,0 +1,578 @@
+# Product Requirements Document: Meno Learning Companion MVP
+
+## Executive Summary
+
+Meno Learning Companion MVP is a web application that provides an AI-powered chat interface where developers can solve technical problems and capture their learnings to share with their team. Named after Plato's Meno dialogue about learning through questioning, it transforms individual problem-solving sessions into shareable team knowledge by adding just 45 seconds to capture and reflect on solutions.
+
+## Problem Statement
+
+**Current State**: People use AI to solve problems in isolation. Knowledge gained dies in private chat sessions. Teams and communities repeatedly solve identical issues.
+
+**Concrete Impact**: 
+- Teams waste 15+ hours/week on previously-solved problems
+- Experienced professionals can't transfer knowledge efficiently  
+- Newcomers lack access to collective knowledge
+- Organizations and communities lose competitive advantage as expertise doesn't compound
+
+## Vision
+
+Create a simple tool that makes capturing and sharing AI-assisted problem solutions as easy as clicking a button.
+
+## Learning Principles
+
+- **Reflection**: Immediate capture promotes metacognition by requiring users to pause and think about what they just learned
+- **Generation Effect**: Users articulate solutions in their own words, which improves retention compared to passive consumption
+- **Spaced Repetition**: History view enables periodic review of past learnings, reinforcing knowledge over time
+- **Social Learning**: Sharing creates teaching opportunities where explaining to others deepens one's own understanding
+- **Confidence Calibration**: Self-assessment improves learning awareness and helps identify knowledge gaps
+
+## MVP Scope
+
+### In Scope
+- Manual capture trigger (floating button)
+- Simple 3-question form
+- **AI-powered Socratic follow-up question**
+- **AI-generated key learning with validation**
+- **Self-reflection rating**
+- Local browser storage
+- Copy-to-clipboard sharing
+- Basic capture history view
+
+### Out of Scope (Future)
+- Automatic problem/solution detection
+- Cloud storage and team sync
+- Slack/Teams integrations
+- Analytics and insights
+- Search and discovery
+
+## User Personas
+
+**Primary: Sarah the Knowledge Worker**
+- Uses Claude 10+ times/day for various tasks (research, writing, analysis)
+- Wants to help teammates but lacks time to document
+- Needs frictionless knowledge capture
+
+**Secondary: Tom the Learning Enthusiast**
+- Often solves problems others have faced
+- Wants to contribute to community knowledge
+- Needs simple way to share learnings
+
+## Core User Flow
+
+### 1. Problem Solving (Normal Claude Usage)
+User works with Claude-powered application to solve a problem as they normally would, as if they were using Claude.ai.
+
+### 2. Learning Capture Trigger
+- User clicks floating "💡 Capture Learning" button
+- Application automatically analyzes the conversation context
+
+### 3. Quick Capture Form
+Simple modal appears with audience selection:
+```
+"I'll help track this problem and solution. Who might face this same problem?"
+
+👥 My Team
+🔮 Future me  
+🆕 New hires
+
+[Select one or more]
+```
+
+Modal then presents three questions:
+```
+What was the problem?
+[Text input with context from conversation]
+
+What was its cause?
+[Text input]
+
+What was the solution?
+[Text input]
+
+[Generate Card] [Cancel]
+```
+
+### 4. AI-Enhanced Learning
+Claude API performs comprehensive analysis:
+
+**A) Summary Assessment:**
+- Analyzes full conversation context
+- Evaluates user's summary against chat content
+- Determines if reflection demonstrates understanding
+
+**B) Contextual Socratic Question:**
+```
+Based on your discussion about [specific topic], here's a deeper question:
+"[Contextual question that promotes interaction and learning]"
+
+[User's response - encouraged to deepen understanding]
+```
+
+**C) Key Learning Generation:**
+```
+From your conversation, the key principle seems to be:
+"[AI-generated insight aligned with conversation flow]"
+
+Does this capture the main takeaway?
+[✓ Yes, exactly] [✗ Let me revise]
+```
+
+**D) Alignment Feedback:**
+- Shows how well user's summary aligns with the conversation
+- Provides suggestions if key aspects were missed
+- Offers to refine the capture
+
+**E) Confidence Assessment:**
+```
+How confident are you in your understanding?
+[😕 Still learning] [🤔 Somewhat confident] [😊 Very confident]
+```
+
+### 5. Enhanced Insight Card Generation
+Creates formatted learning card with:
+- Problem, cause, and solution summary
+- Selected audience context (Team/Future me/New hires)
+- Key learning principle
+- Contextual insights from conversation
+- Understanding level indicator
+- Timestamp and author
+
+Example card:
+```
+💡 Learning Insight - For: My Team & Future me
+
+**Problem:** Excel formulas not updating automatically
+**Cause:** Calculation mode was set to manual
+**Solution:** Changed to automatic via Formulas > Calculation Options
+
+**Key Learning:** Always check calculation settings when Excel formulas seem broken
+
+**Context:** Discovered while building financial model - affects all workbooks on the computer, not just current file
+
+📊 Confidence: 😊 Very confident
+
+- Sarah Chen | Nov 15, 2024
+```
+
+### 6. Store and Share Insight Card
+- **Copy to Clipboard**: One-click sharing to Slack/Teams/Email
+- **Insight Library**: 
+  - Cards stored chronologically
+  - Filterable by audience, confidence level, or date
+  - Each card can be viewed, edited, shared, or deleted
+  - Search functionality for finding past insights
+- **Quick Actions**: Share, duplicate, or delete from library view
+
+## Example Learning Scenarios
+
+### Scenario 1: Student Masters Research Methodology
+**Context**: Maya (graduate student) struggles with literature review methodology.
+
+**AI Interaction**: Claude helps Maya develop a systematic approach to finding, evaluating, and synthesizing academic sources.
+
+**Capture Process**:
+- **Issue**: "Can't organize 50+ papers for lit review"
+- **Investigation**: "Tried folders by date, got confused about themes"
+- **Solution**: "Created matrix: themes vs. methodologies, tagged papers with both"
+
+**Socratic Follow-up**: "How might this approach work for other types of information organization?"
+- Maya's response: "Could use for organizing class notes or project resources too"
+
+**Key Learning Generated**: "Use multi-dimensional tagging (theme + method) instead of folders for complex information"
+
+**Community Impact**: When shared in study group, classmates adopt the matrix approach for their own research.
+
+### Scenario 2: Marketing Team Discovers Content Pattern
+**Context**: Multiple team members capture learnings about social media engagement over two weeks.
+
+**Pattern Emerges**:
+- 3 captures about video content performing better
+- 2 captures about optimal posting times
+- All initially rated "🤔 Somewhat confident"
+
+**Learning Evolution**:
+- Team realizes engagement follows predictable patterns
+- Creates shared insight: "Video + morning posts = 3x engagement"
+- Future captures show increasing confidence
+- New team practice: A/B test all content formats
+
+### Scenario 3: Designer Accesses Creative Problem-Solving Technique
+**Context**: Alex (new designer) stuck on logo iterations feeling "all the same."
+
+**Searches History**: Finds Jordan's capture from last month:
+- **Issue**: "Logo designs feeling stale and repetitive"
+- **Investigation**: "Kept refining same concept, minor tweaks only"
+- **Solution**: "Used 'opposite day' technique - designed the worst possible logo first, then inverted those choices"
+- **Key Learning**: "When stuck creatively, design the opposite first to break mental patterns"
+
+**Impact**: 
+- Alex breaks through creative block in 30 minutes
+- Adds follow-up: "Also tried with color palettes - worked great!"
+- Shares technique in next design critique session
+
+## MVP Features
+
+### P0 - Core Loop
+1. **Floating Capture Button**
+   - Always visible on Claude.ai
+   - Non-intrusive positioning
+   - Clear call-to-action
+
+2. **Capture Modal**
+   - Three text inputs
+   - Auto-focus on first field
+   - Escape to close
+
+3. **AI Learning Enhancement**
+   - **Socratic Follow-up**: AI asks one deepening question
+   - **Confidence Assessment**: User self-reports understanding level
+   - **Key Learning Generation**: AI extracts the principle
+   - **Navigation**: Back button to edit previous answers
+   - **Learning Validation**: User confirms or revises
+
+4. **Local Storage**
+   - Save captures with enhanced learnings
+   - Include reflection ratings
+   - Persist across sessions
+
+5. **Enhanced Share Card**
+   - Includes validated key learning
+   - Shows understanding level
+   - Ready for team education
+
+6. **History View**
+   - See past captures with learnings
+   - Filter by confidence level
+   - Copy any previous card
+
+## Technical Requirements
+
+### Web Application
+- Single page application (index.html)
+- API route for Claude integration (/api/chat.js)
+- Deployed on Vercel
+- Mobile responsive design
+
+### Browser Compatibility
+- Chrome/Edge/Safari/Firefox
+- Mobile browsers supported
+
+### API Integration
+- Claude API via server-side proxy
+- Environment variables for API keys
+- Secure server-side handling
+
+### Performance
+- < 50ms to show capture form
+- No impact on Claude.ai performance
+
+## Success Metrics
+
+### MVP Success Criteria
+- **Installation**: 10 team members install and try it
+- **Usage**: 5+ captures per user in first week
+- **Learning Enhancement**: 70%+ engage with Socratic questions
+- **Reflection**: 60%+ rate understanding as "Confident"
+- **Sharing**: 50% of captures get shared
+- **Feedback**: 8/10 or higher "helped me understand better"
+
+### Learning-Specific Metrics
+- **Comprehension**: 80% of users can explain captured solutions without referring to notes after 24 hours
+- **Transfer**: 50% of users report applying a captured learning to a new problem within one week
+- **Teaching**: 30% of shared cards lead to team discussions or follow-up questions
+- **Retention**: 60% of users can recall key learnings from captures after 1 week
+- **Metacognition**: Users' confidence ratings correlate with actual performance (measured via follow-up quiz)
+
+### Key Questions to Answer
+1. Do people actually click capture?
+2. What types of problems get captured?
+3. Where do people share (Slack vs Teams vs Wiki)?
+4. What's preventing more usage?
+5. Does the Socratic questioning actually deepen understanding?
+6. Are the AI-generated key learnings accurate and valuable?
+
+## Future Enhancements
+
+### Phase 1: Intelligent Capture
+- **Auto-detection**: Detect when problems are solved in chat
+- **Smart pre-fill**: Extract issue/solution from conversation
+- **Rich capture**: Include code snippets, error messages
+- **Audience selection**: Tag captures for specific groups
+
+### Phase 2: Team Knowledge Base
+- **Cloud sync**: Share captures across team
+- **Search**: Find previous solutions quickly
+- **Similar problems**: "3 people solved this before"
+- **Analytics**: What's your team learning?
+
+### Phase 3: Workflow Integration
+- **Slack/Teams apps**: Direct posting
+- **IDE integration**: Access knowledge while coding
+- **CI/CD hooks**: Suggest solutions in PR comments
+- **Documentation generation**: Auto-create runbooks
+
+### Phase 4: Intelligence Layer
+- **Pattern recognition**: Identify recurring issues
+- **Proactive suggestions**: "Tom might need this"
+- **Learning paths**: Onboard new hires with real examples
+- **Impact tracking**: Measure time saved
+
+### Long-term Vision Features
+- **Multi-AI support**: Integrate with other AI models
+- **Video capture**: Record solution walkthroughs
+- **Collaborative debugging**: Real-time knowledge sharing
+- **Enterprise features**: SSO, admin controls, compliance
+- **Mobile app**: Native iOS/Android applications
+
+## Rollout Strategy
+
+### Week 1: Internal Testing
+- Deploy to Vercel
+- 5 volunteers test the web app
+- Daily feedback sessions
+- Iterate on UX
+
+### Week 2: Team Pilot
+- Share URL with full team
+- Slack channel for feedback
+- Track usage metrics
+
+### Week 3: Evaluation
+- Survey users
+- Analyze captures
+- Decide on future investment
+
+## Risks & Mitigations
+
+**Risk**: Low usage due to manual trigger
+- **Mitigation**: Make button prominent, remind in standups
+
+**Risk**: Poor quality captures
+- **Mitigation**: Show good examples, gentle prompts
+
+**Risk**: Not enough value for effort
+- **Mitigation**: Reduce to 2 questions if needed
+
+## Design Principles
+
+1. **Zero Friction**: Must not slow down debugging
+2. **Obvious Value**: Benefits clear from first use
+3. **Start Simple**: Prove concept before adding complexity
+4. **User Control**: No automatic actions, user triggers all
+
+---
+
+# PROMPT ARCHITECTURE
+
+## Overview
+
+The Meno Learning Companion uses a sophisticated prompt architecture to create engaging, socially-aware learning experiences. The system employs 8 different types of prompts across AI interactions, user interfaces, and fallback scenarios.
+
+## AI System Prompts
+
+### 1. Main Chat System Prompt
+**Purpose**: Defines Meno's personality and conversational approach
+**Location**: `api/chat.js` (lines 102-108)
+**Usage**: All chat interactions with users
+
+```javascript
+system: `You are Meno, an AI assistant named after the character in Plato's dialogue about learning. 
+You help people solve problems through thoughtful questioning and clear explanations. 
+You work with all kinds of users - students, professionals, researchers, and lifelong learners.
+Be concise, helpful, and encouraging. When users solve problems, encourage them to capture their learnings.
+Use the Socratic method when appropriate to deepen understanding.`
+```
+
+**Design Rationale**: 
+- Establishes Meno's identity as a learning-focused assistant
+- Emphasizes the Socratic method for deeper understanding
+- Encourages knowledge capture behavior
+- Maintains a supportive, educational tone
+
+### 2. Analysis Prompt
+**Purpose**: Generates learning enhancements and audience-specific questions
+**Location**: `api/chat.js` (lines 148-175)
+**Usage**: When users capture learning insights
+
+```javascript
+const analysisPrompt = `Based on this conversation and the user's capture, provide learning enhancements.
+
+Conversation context:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+User's capture:
+- Problem: ${captureData.problem}
+- Cause: ${captureData.cause}
+- Solution: ${captureData.solution}
+- Intended audience: ${captureData.audience}
+
+Please provide:
+1. An assessment of how well their summary captures the essence of the conversation
+2. A realistic question that their actual audience would ask them about this problem/solution. Make it specific and practical:
+   - For "team": What would a teammate actually ask in a code review, standup, or when they encounter this same issue?
+   - For "future": What would you actually wonder when you see this solution 6 months from now?
+   - For "new hires": What would a new team member actually ask when they're trying to understand this?
+3. The key learning principle from this experience
+4. Any suggestions if they missed important aspects
+
+Format your response as JSON with these fields:
+{
+  "alignment": "assessment of their summary",
+  "socraticQuestion": "a realistic question their audience would actually ask them",
+  "keyLearning": "the main principle or insight",
+  "suggestions": "any recommendations or missing elements"
+}`;
+```
+
+**Design Rationale**:
+- Provides conversation context for accurate analysis
+- Generates socially-realistic questions based on audience type
+- Ensures structured JSON response for reliable parsing
+- Focuses on practical, actionable insights
+
+## User Interface Prompts
+
+### 3. Chat Input Placeholder
+**Purpose**: Guides users to start conversations
+**Location**: `index.html` (line 776)
+**Usage**: Main chat interface
+
+```html
+placeholder="Ask me anything..."
+```
+
+**Design Rationale**: Simple, open-ended invitation that doesn't constrain user thinking
+
+### 4. Socratic Response Placeholder
+**Purpose**: Encourages users to respond to AI-generated questions
+**Location**: `index.html` (line 851)
+**Usage**: Learning capture workflow
+
+```html
+placeholder="How would you respond to this question? (optional)..."
+```
+
+**Design Rationale**: 
+- Frames the interaction as a response to a specific question
+- Makes response optional to reduce friction
+- Encourages deeper thinking about the question
+
+### 5. Key Learning Revision Placeholder
+**Purpose**: Allows users to refine AI-generated insights
+**Location**: `index.html` (line 883)
+**Usage**: Learning validation step
+
+```html
+placeholder="Write your own key learning..." rows="2"
+```
+
+**Design Rationale**: Empowers users to take ownership of their learning insights
+
+## Fallback Local Prompts
+
+### 6. Team Questions (Fallback)
+**Purpose**: Provides realistic team-focused questions when AI is unavailable
+**Location**: `index.html` (lines 1335-1340)
+**Usage**: Offline or AI failure scenarios
+
+```javascript
+questions: [
+    "Wait, why did this break in the first place? What was the root cause?",
+    "How do we make sure this doesn't happen again? Should we add some tests?",
+    "What if this happens in production? Do we have monitoring for this?",
+    "Could this affect other parts of the system? Should we check?"
+]
+```
+
+**Design Rationale**: 
+- Mimics real team conversations in code reviews and standups
+- Focuses on practical concerns (testing, monitoring, system impact)
+- Uses casual, conversational language
+
+### 7. Future Self Questions (Fallback)
+**Purpose**: Provides introspective questions for future reference
+**Location**: `index.html` (lines 1341-1346)
+**Usage**: Offline or AI failure scenarios
+
+```javascript
+questions: [
+    "What was I thinking when I wrote this? Why did I choose this approach?",
+    "How did I figure out this was the problem? What debugging steps did I take?",
+    "What if this breaks again? Do I remember all the steps to fix it?",
+    "Is there a better way to solve this now that I understand it better?"
+]
+```
+
+**Design Rationale**:
+- Encourages metacognitive reflection
+- Focuses on decision-making processes
+- Prepares for future problem-solving scenarios
+
+### 8. New Hire Questions (Fallback)
+**Purpose**: Provides onboarding-focused questions for knowledge transfer
+**Location**: `index.html` (lines 1347-1352)
+**Usage**: Offline or AI failure scenarios
+
+```javascript
+questions: [
+    "I'm seeing this same error - what should I check first?",
+    "What background do I need to understand this problem?",
+    "Where can I find more info about this? Are there docs?",
+    "How often does this happen? Is this a common issue?"
+]
+```
+
+**Design Rationale**:
+- Addresses common new hire concerns
+- Focuses on practical troubleshooting steps
+- Emphasizes knowledge discovery and documentation
+
+## Prompt Design Principles
+
+### 1. Social Realism
+All prompts are designed to mimic real human interactions and conversations, making the learning experience feel natural and engaging.
+
+### 2. Audience Awareness
+Prompts adapt based on the intended audience (team, future self, new hires) to ensure relevance and usefulness.
+
+### 3. Progressive Disclosure
+Information is revealed gradually through the conversation flow, preventing cognitive overload.
+
+### 4. Error Resilience
+Fallback prompts ensure the system remains functional even when AI services are unavailable.
+
+### 5. User Empowerment
+Prompts encourage users to take ownership of their learning and validate AI-generated insights.
+
+### 6. Practical Focus
+All prompts emphasize actionable insights and real-world application rather than abstract concepts.
+
+## Prompt Flow Architecture
+
+```
+User Input → Chat System Prompt → Claude Response
+     ↓
+Capture Trigger → Analysis Prompt → Enhanced Learning
+     ↓
+UI Prompts → User Reflection → Validation
+     ↓
+Fallback Prompts → Local Enhancement → Complete
+```
+
+## Future Prompt Enhancements
+
+### Planned Improvements
+1. **Contextual Awareness**: Prompts that adapt based on user's learning history
+2. **Domain-Specific Prompts**: Tailored questions for different fields (engineering, design, research)
+3. **Collaborative Prompts**: Questions that encourage team discussion and knowledge sharing
+4. **Progressive Complexity**: Prompts that increase in sophistication as users become more experienced
+
+### Research Areas
+1. **Prompt Effectiveness**: Measuring which prompt types lead to better learning outcomes
+2. **User Engagement**: Understanding which prompts encourage continued usage
+3. **Knowledge Retention**: Correlating prompt types with long-term learning retention
+4. **Social Impact**: Measuring how prompts influence team knowledge sharing behavior
+
+---
+
+*"Start simple. Capture one learning today. Help one teammate tomorrow."* 
